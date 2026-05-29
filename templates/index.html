@@ -4,62 +4,48 @@
 
 {% block extra_head %}
 <style>
-    /* Sweeping Red Laser Ray border highlight */
-    .movie-row::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        border: 1px solid transparent;
-        border-radius: 4px;
-        background: linear-gradient(90deg, transparent, #E50914, transparent) border-box;
-        -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
-        -webkit-mask-composite: destination-out;
-        mask-composite: exclude;
-        background-size: 200% 100%;
-        background-position: 200% center;
-        transition: opacity 0.3s;
-        opacity: 0;
-        pointer-events: none;
+    .poster-gradient {
+        background: linear-gradient(to top, rgba(18, 20, 20, 0.95) 0%, rgba(18, 20, 20, 0) 60%);
     }
-
-    .movie-row:hover::after {
-        opacity: 1;
-        animation: borderLaser 1.5s linear infinite;
+    .movie-card-hover {
+        transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
     }
-
-    @keyframes borderLaser {
-        0% { background-position: 200% center; }
-        100% { background-position: -200% center; }
+    .movie-card-hover:hover {
+        transform: translateY(-8px) scale(1.04);
+        box-shadow: 0 20px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(229, 9, 20, 0.15);
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- Cinematic Hero Banner Section -->
+<!-- Cinematic Brand Hero Section -->
 <section class="relative w-full aspect-[16/9] md:aspect-[21/9] flex items-end overflow-hidden">
-    <div class="absolute inset-0 z-0">
-        <img class="w-full h-full object-cover select-none transition-transform duration-[10s] ease-out scale-105" id="hero-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBN_A_7vsgIFE4CGanYJ_rrLtdAjGmgy-2ydTNA1zfg-V3DmvHu558y5xor194hs66_d4LYiDkOewvIjzZdOWr4BGhriJ1Osq1lNO1eALzWzJloQv_cLF-AOSqqzwy9m6kBtVXuh4Pr_ijNrrnyk1QUOk0oN_NsQtilACWGDHnPQxmgbcmm4MLq-1rpiMDM2bGvjzpSAtk2TlJUApOeQF7gmMer6Khvwse2gAPmlilygvGzNEwlcP4RBALg55Er_OR6M7YG9kCHwFAk" alt="Futuristic Cityscape"/>
-        <div class="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent"></div>
+    <div class="absolute inset-0 z-0 overflow-hidden">
+        <!-- Retro Horror Movie Collage Backdrop -->
+        <img class="absolute inset-0 w-full h-full object-cover opacity-30 select-none pointer-events-none filter blur-[1px] md:blur-[2px] scale-105 transition-transform duration-[10s] ease-out" id="hero-cover" src="{{ url_for('static', filename='images/hero_collage.jpg') }}" alt="Cinematic Backdrop Collage"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent"></div>
         <div class="absolute inset-0 bg-gradient-to-r from-background via-transparent to-transparent"></div>
     </div>
     
     <div class="relative z-10 px-margin-mobile md:px-margin-desktop pb-12 w-full max-w-4xl">
-        <div class="flex items-center gap-3 mb-4">
-            <span class="px-3 py-1 bg-on-tertiary-container text-white text-[10px] font-extrabold rounded-full uppercase tracking-widest shadow-md">Top Match for You</span>
-            <span class="text-on-tertiary-container font-extrabold text-title-md text-glow">{{ hero_movie.match }}% Match</span>
+        <div class="flex items-center gap-3 mb-3">
+            <span class="px-3 py-1 bg-on-tertiary-container text-white text-[10px] font-extrabold rounded-full uppercase tracking-widest shadow-md">NEURAL DISCOVERY PLATFORM</span>
         </div>
-        <h2 class="font-display-lg text-[48px] md:text-[72px] leading-[0.9] text-on-surface mb-4 uppercase tracking-tighter">{{ hero_movie.title }}</h2>
-        <p class="text-on-surface-variant font-body-md max-w-xl mb-8 line-clamp-3 leading-relaxed">{{ hero_movie.plot }}</p>
+        <h2 class="font-display-lg text-[64px] md:text-[88px] leading-[0.9] text-on-surface mb-2 uppercase tracking-tighter text-glow">CINEMATCH</h2>
+        <h3 class="font-title-md text-title-md text-on-tertiary-container uppercase tracking-[0.2em] font-extrabold mb-5">Streamline your stream</h3>
+        <p class="text-on-surface-variant font-body-md max-w-2xl mb-8 leading-relaxed text-sm md:text-base">
+            Welcome to the future of film exploration. **CineMatch** is an AI-powered movie recommendation platform designed to cut through the catalog noise. By analyzing thousands of Netflix titles and understanding your unique preferences, CineMatch filters down selections across mood genres, release eras, and runtime boundaries to deliver perfectly matched selections.
+        </p>
         
         <div class="flex flex-wrap gap-4">
-            <button onclick="alert('Starting dynamic high-fidelity playback of {{ hero_movie.title }}...')" class="px-8 py-4 bg-on-surface text-background hover:bg-white rounded-lg font-extrabold flex items-center gap-2 active:scale-95 transition-all shadow-lg hover:shadow-white/10">
-                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
-                WATCH NOW
-            </button>
-            <button id="hero-watchlist-btn" onclick="toggleHeroWatchlist()" class="px-8 py-4 bg-white/10 backdrop-blur-md text-white border border-white/20 hover:bg-white/20 rounded-lg font-extrabold flex items-center gap-2 active:scale-95 transition-all">
-                <span class="material-symbols-outlined" id="hero-watchlist-icon">add</span>
-                <span id="hero-watchlist-text">WATCHLIST</span>
-            </button>
+            <a href="/genres" class="px-8 py-4 bg-on-surface text-background hover:bg-white rounded-lg font-extrabold flex items-center gap-2 active:scale-95 transition-all shadow-lg hover:shadow-white/10">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">movie_filter</span>
+                EXPLORE GENRES
+            </a>
+            <a href="/eras" class="px-8 py-4 bg-white/10 backdrop-blur-md text-white border border-white/20 hover:bg-white/20 rounded-lg font-extrabold flex items-center gap-2 active:scale-95 transition-all">
+                <span class="material-symbols-outlined">history_toggle_off</span>
+                EXPLORE ERAS
+            </a>
         </div>
     </div>
 </section>
@@ -186,32 +172,39 @@
                 {% endif %}
             </div>
             
-            <div class="movies-list space-y-4">
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-gutter">
                 {% for movie in results %}
-                    <div class="movie-row relative grid grid-cols-1 md:grid-cols-[2.5fr_1fr_1fr_0.8fr] gap-6 p-6 bg-surface-container-low border border-white/5 hover:bg-surface-container hover:border-on-tertiary-container rounded-xl items-center transition-all duration-300 hover:shadow-xl hover:shadow-on-tertiary-container/5 hover:-translate-y-1">
-                        <div class="space-y-2">
-                            <h4 class="text-xl md:text-2xl font-extrabold text-white leading-snug">{{ movie.title }}</h4>
-                            <p class="text-sm text-on-surface-variant leading-relaxed max-w-xl">{{ movie.plot }}</p>
+                    <div class="movie-card-hover group relative aspect-[2/3] rounded-xl overflow-hidden bg-surface-container cursor-pointer shadow-2xl" onclick="openMovieDetail('{{ movie.title }}', '{{ movie.genres }}', '{{ movie.year }}', '{{ movie.rating }}', '{{ movie.plot }}')">
+                        <img class="w-full h-full object-cover lazy-cover" data-title="{{ movie.title }}" data-genres="{{ movie.genres }}" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 3'%3E%3C/svg%3E" alt="{{ movie.title }}"/>
+                        <div class="absolute top-3 right-3 bg-on-tertiary-container text-white text-[10px] font-extrabold px-2 py-0.5 rounded tracking-wider shadow">
+                            {{ movie.match }}% MATCH
                         </div>
-                        <div class="text-sm text-on-surface">
-                            <span class="text-[10px] text-white bg-white/10 border border-white/20 rounded px-2.5 py-0.5 font-bold uppercase tracking-wider">{{ movie.type }}</span>
-                            <div class="font-extrabold text-lg mt-2">{{ movie.year }}</div>
-                            <div class="text-on-surface-variant font-bold text-xs mt-1">⭐ {{ movie.rating }} / 10</div>
+                        
+                        <!-- Watchlist overlay badge indicator -->
+                        <div class="badge absolute top-3 left-3 bg-emerald-500 text-white rounded-full w-5 h-5 flex items-center justify-center font-bold text-[9px]" style="display: none">
+                            <span class="material-symbols-outlined text-[10px]" style="font-variation-settings: 'wght' 800;">check</span>
                         </div>
-                        <div class="text-xs text-on-surface-variant font-semibold leading-relaxed">
-                            {{ movie.genres }}
-                        </div>
-                        <div class="flex md:flex-col items-center md:items-end justify-between md:justify-center gap-4">
-                            <div class="text-emerald-400 font-extrabold text-sm tracking-wider uppercase">
-                                {{ movie.match }}% Match
+
+                        <div class="poster-gradient absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                            <div class="bg-black/60 backdrop-blur-md p-3 rounded-lg border border-white/10 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                                <h4 class="font-title-md text-white text-sm truncate font-extrabold">{{ movie.title }}</h4>
+                                <div class="flex gap-2 mt-1 text-[10px] text-white/60 font-semibold">
+                                    <span>{{ movie.year }}</span>
+                                    <span>•</span>
+                                    <span>{{ movie.type }}</span>
+                                </div>
+                                <div class="mt-3 pt-3 border-t border-white/10 flex justify-between items-center">
+                                    <button onclick="event.stopPropagation(); toggleCardWatchlist(this.closest('.movie-card-hover'), '{{ movie.title }}', '{{ movie.genres }}', '{{ movie.year }}', '{{ movie.type }}', '{{ movie.rating }}', '{{ movie.plot }}')" class="watchlist-toggle-btn px-3 py-1 bg-white text-black text-[10px] font-bold rounded flex items-center gap-1 active:scale-95 transition-all">
+                                        <span class="material-symbols-outlined text-[11px]">bookmark</span>
+                                        Watchlist
+                                    </button>
+                                    <span class="text-[10px] text-on-tertiary-container font-extrabold">⭐ {{ movie.rating }}</span>
+                                </div>
                             </div>
-                            <button onclick="toggleCardWatchlist(this, '{{ movie.title }}', '{{ movie.genres }}', '{{ movie.year }}', '{{ movie.type }}', '{{ movie.rating }}', '{{ movie.plot }}')" class="watchlist-toggle-btn w-10 h-10 rounded-full glass-panel flex items-center justify-center text-white hover:bg-on-tertiary-container transition-all" title="Save to Watchlist">
-                                <span class="material-symbols-outlined text-sm">add</span>
-                            </button>
                         </div>
                     </div>
                 {% else %}
-                    <div class="p-12 text-center text-on-surface-variant font-medium bg-surface-container-low border border-white/5 rounded-lg shadow-inner">
+                    <div class="col-span-full p-12 text-center text-on-surface-variant font-medium bg-surface-container-low border border-white/5 rounded-lg shadow-inner">
                         No netflix titles isolated matching active search queries or industry filters.
                     </div>
                 {% endfor %}
@@ -346,45 +339,11 @@
             
             loadRealPoster(title, img, defaultCover);
         });
-
-        const heroCover = document.getElementById("hero-cover");
-        if (heroCover) {
-            loadRealPoster("{{ hero_movie.title }}", heroCover, "https://lh3.googleusercontent.com/aida-public/AB6AXuBN_A_7vsgIFE4CGanYJ_rrLtdAjGmgy-2ydTNA1zfg-V3DmvHu558y5xor194hs66_d4LYiDkOewvIjzZdOWr4BGhriJ1Osq1lNO1eALzWzJloQv_cLF-AOSqqzwy9m6kBtVXuh4Pr_ijNrrnyk1QUOk0oN_NsQtilACWGDHnPQxmgbcmm4MLq-1rpiMDM2bGvjzpSAtk2TlJUApOeQF7gmMer6Khvwse2gAPmlilygvGzNEwlcP4RBALg55Er_OR6M7YG9kCHwFAk");
-        }
     }
 
     // Modal view for cinema experience details
     function openMovieDetail(title, genres, year, rating, plot) {
         alert(`${title} (${year})\n⭐ Rating: ${rating}/10\nGenres: ${genres}\n\nPlot: ${plot}`);
-    }
-
-    // Hero watchlist add/remove toggle
-    function toggleHeroWatchlist() {
-        const title = "{{ hero_movie.title }}";
-        const btn = document.getElementById("hero-watchlist-btn");
-        const icon = document.getElementById("hero-watchlist-icon");
-        const text = document.getElementById("hero-watchlist-text");
-        
-        if (CineWatchlist.has(title)) {
-            CineWatchlist.remove(title);
-            icon.textContent = "add";
-            text.textContent = "WATCHLIST";
-            btn.classList.remove("bg-on-tertiary-container");
-            btn.classList.add("bg-white/10");
-        } else {
-            CineWatchlist.add({
-                title: title,
-                genres: "{{ hero_movie.genres }}",
-                year: "{{ hero_movie.year }}",
-                type: "Movie",
-                rating: "{{ hero_movie.rating }}",
-                plot: "{{ hero_movie.plot }}"
-            });
-            icon.textContent = "check";
-            text.textContent = "SAVED";
-            btn.classList.remove("bg-white/10");
-            btn.classList.add("bg-on-tertiary-container");
-        }
     }
 
     // Watchlist shelf carousel item toggle
@@ -401,16 +360,16 @@
     }
 
     // Search results card item toggle
-    function toggleCardWatchlist(btn, title, genres, year, type, rating, plot) {
-        const icon = btn.querySelector(".material-symbols-outlined");
+    function toggleCardWatchlist(card, title, genres, year, type, rating, plot) {
+        const badge = card.querySelector(".badge");
         if (CineWatchlist.has(title)) {
             CineWatchlist.remove(title);
-            icon.textContent = "add";
-            btn.classList.remove("bg-on-tertiary-container");
+            if (badge) badge.style.display = "none";
+            card.classList.remove("border", "border-on-tertiary-container");
         } else {
             CineWatchlist.add({ title, genres, year, type, rating, plot });
-            icon.textContent = "check";
-            btn.classList.add("bg-on-tertiary-container");
+            if (badge) badge.style.display = "flex";
+            card.classList.add("border", "border-on-tertiary-container");
         }
     }
 
@@ -441,12 +400,12 @@
         });
 
         // Search card checkboxes
-        document.querySelectorAll(".watchlist-toggle-btn").forEach(button => {
-            const row = button.closest(".movie-row");
-            const titleElem = row.querySelector("h4");
+        document.querySelectorAll(".movie-card-hover").forEach(card => {
+            const titleElem = card.querySelector("h4");
             if (titleElem && CineWatchlist.has(titleElem.textContent.trim())) {
-                button.querySelector(".material-symbols-outlined").textContent = "check";
-                button.classList.add("bg-on-tertiary-container");
+                const badge = card.querySelector(".badge");
+                if (badge) badge.style.display = "flex";
+                card.classList.add("border", "border-on-tertiary-container");
             }
         });
     }

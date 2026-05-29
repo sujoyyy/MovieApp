@@ -61,8 +61,26 @@ def query_movies(selected_genres=None, era=None, max_runtime=240, industry='All'
         
         genre_conditions = []
         for genre in selected_genres:
-            genre_conditions.append("genres LIKE ?")
-            params.append(f"%{genre}%")
+            g_lower = genre.lower()
+            if g_lower == 'biopic':
+                # Biopics are mapped to Documentaries or Dramas with biographical plot indicators
+                genre_conditions.append("(genres LIKE ? OR genres LIKE ?) AND (plot_summary LIKE ? OR plot_summary LIKE ? OR plot_summary LIKE ? OR title LIKE ?)")
+                params.extend(["%Documentaries%", "%Dramas%", "%biography%", "%biopic%", "%true story%", "%story%"])
+            elif g_lower == 'horror' or g_lower == 'horror comedy':
+                genre_conditions.append("(genres LIKE ?)")
+                params.append("%Horror%")
+            elif g_lower == 'fantasy' or g_lower == 'fantashy':
+                genre_conditions.append("(genres LIKE ? OR genres LIKE ?)")
+                params.extend(["%Fantasy%", "%Sci-Fi%"])
+            elif g_lower == 'mystery' or g_lower == 'mystry':
+                genre_conditions.append("(genres LIKE ? OR genres LIKE ?)")
+                params.extend(["%Mysteries%", "%Thriller%"])
+            elif g_lower == 'romantic' or g_lower == 'romance':
+                genre_conditions.append("(genres LIKE ? OR genres LIKE ?)")
+                params.extend(["%Romantic%", "%Comedies%"])
+            else:
+                genre_conditions.append("genres LIKE ?")
+                params.append(f"%{genre}%")
         sql += " AND (" + " OR ".join(genre_conditions) + ")"
         
     # 6. Global text-matching query checks
