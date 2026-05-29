@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>{% block title %}CineMatch | Premium Discovery{% endblock %}</title>
+    
+    <!-- Google Fonts & Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Anybody:wght@100..900&family=Inter:wght@100..900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
+    <!-- Tailwind CSS with Forms and Container Queries -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-container": "#474746",
+                        "surface-bright": "#38393a",
+                        "on-tertiary-fixed-variant": "#930000",
+                        "on-surface-variant": "#c4c7c7",
+                        "primary-fixed": "#e5e2e1",
+                        "on-tertiary-fixed": "#410000",
+                        "on-background": "#e2e2e2",
+                        "primary-container": "#121212",
+                        "on-secondary-fixed": "#1b1b1c",
+                        "surface-container-highest": "#333535",
+                        "outline-variant": "#444748",
+                        "surface": "#121414",
+                        "surface-tint": "#c8c6c5",
+                        "error-container": "#93000a",
+                        "inverse-primary": "#5f5e5e",
+                        "surface-container-high": "#282a2b",
+                        "primary-fixed-dim": "#c8c6c5",
+                        "on-tertiary-container": "#E50914", /* Premium Red */
+                        "tertiary-fixed": "#ffdad4",
+                        "on-primary-container": "#7e7d7d",
+                        "on-secondary-container": "#b7b5b4",
+                        "surface-container": "#1e2020",
+                        "inverse-surface": "#e2e2e2",
+                        "on-secondary-fixed-variant": "#474746",
+                        "tertiary-container": "#2f0000",
+                        "on-error": "#690005",
+                        "surface-container-lowest": "#0c0f0f",
+                        "on-surface": "#e2e2e2",
+                        "surface-variant": "#333535",
+                        "on-primary": "#313030",
+                        "secondary": "#c8c6c5",
+                        "tertiary": "#ffb4a8",
+                        "outline": "#8e9192",
+                        "background": "#121414",
+                        "inverse-on-surface": "#2f3131",
+                        "tertiary-fixed-dim": "#ffb4a8",
+                        "on-tertiary": "#690000",
+                        "secondary-fixed": "#e5e2e1",
+                        "on-secondary": "#303030",
+                        "on-primary-fixed-variant": "#474646",
+                        "secondary-fixed-dim": "#c8c6c5",
+                        "on-error-container": "#ffdad6",
+                        "surface-dim": "#121414",
+                        "surface-container-low": "#1a1c1c",
+                        "error": "#ffb4ab",
+                        "primary": "#c8c6c5",
+                        "on-primary-fixed": "#1c1b1b"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "12px",
+                        "xl": "16px",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "8px",
+                        "margin-mobile": "16px",
+                        "margin-desktop": "64px",
+                        "container-max-width": "1440px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Bebas Neue", "sans-serif"],
+                        "title-md": ["Anybody", "sans-serif"],
+                        "display-lg": ["Bebas Neue", "sans-serif"],
+                        "label-sm": ["Inter", "sans-serif"],
+                        "body-md": ["Anybody", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "0.01em", "fontWeight": "400"}],
+                        "title-md": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "0.02em", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(26, 28, 28, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        body::-webkit-scrollbar {
+            width: 8px;
+        }
+        body::-webkit-scrollbar-track {
+            background: #121414;
+        }
+        body::-webkit-scrollbar-thumb {
+            background: #333535;
+            border-radius: 4px;
+        }
+        body::-webkit-scrollbar-thumb:hover {
+            background: #444748;
+        }
+        .text-glow {
+            text-shadow: 0 0 10px rgba(229, 9, 20, 0.6);
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-background text-on-background font-body-md overflow-x-hidden">
+
+<!-- SideNavBar Component (Desktop Only) -->
+<aside class="fixed left-0 top-0 h-full flex flex-col p-4 z-40 bg-surface-container-low border-r border-white/5 w-64 hidden md:flex">
+    <div class="mb-10 px-2 flex items-center gap-3">
+        <div class="w-10 h-10 bg-on-tertiary-container rounded-lg flex items-center justify-center shadow-lg shadow-on-tertiary-container/30">
+            <span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">movie</span>
+        </div>
+        <div>
+            <h1 class="font-headline-lg text-headline-lg text-on-surface leading-none tracking-wider">CineMatch</h1>
+            <p class="text-[10px] text-on-surface-variant tracking-[0.2em] uppercase font-bold text-glow">Premium Cinema</p>
+        </div>
+    </div>
+    
+    <nav class="flex-1 space-y-2">
+        <a class="flex items-center gap-4 p-3 rounded-lg transition-all duration-300 group hover:translate-x-1 {% if active_page == 'home' %}bg-secondary-container text-white font-bold shadow-md{% else %}text-on-surface-variant hover:bg-surface-bright/50 hover:text-on-surface{% endif %}" href="/">
+            <span class="material-symbols-outlined {% if active_page == 'home' %}text-on-tertiary-container{% endif %}" style="font-variation-settings: 'FILL' {% if active_page == 'home' %}1{% else %}0{% endif %};">home</span>
+            <span class="font-body-md text-body-md">Home</span>
+        </a>
+        <a class="flex items-center gap-4 p-3 rounded-lg transition-all duration-300 group hover:translate-x-1 {% if active_page == 'genres' %}bg-secondary-container text-white font-bold shadow-md{% else %}text-on-surface-variant hover:bg-surface-bright/50 hover:text-on-surface{% endif %}" href="/genres">
+            <span class="material-symbols-outlined {% if active_page == 'genres' %}text-on-tertiary-container{% endif %}" style="font-variation-settings: 'FILL' {% if active_page == 'genres' %}1{% else %}0{% endif %};">movie_filter</span>
+            <span class="font-body-md text-body-md">Genres</span>
+        </a>
+        <a class="flex items-center gap-4 p-3 rounded-lg transition-all duration-300 group hover:translate-x-1 {% if active_page == 'eras' %}bg-secondary-container text-white font-bold shadow-md{% else %}text-on-surface-variant hover:bg-surface-bright/50 hover:text-on-surface{% endif %}" href="/eras">
+            <span class="material-symbols-outlined {% if active_page == 'eras' %}text-on-tertiary-container{% endif %}" style="font-variation-settings: 'FILL' {% if active_page == 'eras' %}1{% else %}0{% endif %};">history_toggle_off</span>
+            <span class="font-body-md text-body-md">Eras</span>
+        </a>
+        <a class="flex items-center gap-4 p-3 rounded-lg transition-all duration-300 group hover:translate-x-1 {% if active_page == 'watchlist' %}bg-secondary-container text-white font-bold shadow-md{% else %}text-on-surface-variant hover:bg-surface-bright/50 hover:text-on-surface{% endif %}" href="/watchlist">
+            <span class="material-symbols-outlined {% if active_page == 'watchlist' %}text-on-tertiary-container{% endif %}" style="font-variation-settings: 'FILL' {% if active_page == 'watchlist' %}1{% else %}0{% endif %};">bookmark</span>
+            <span class="font-body-md text-body-md">Watchlist</span>
+            <span id="nav-watchlist-count" class="ml-auto bg-on-tertiary-container text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full hidden">0</span>
+        </a>
+    </nav>
+    
+    <div class="mt-auto p-4 rounded-xl bg-gradient-to-br from-tertiary-container to-surface-container-highest border border-white/10 relative overflow-hidden group">
+        <div class="absolute -right-6 -bottom-6 opacity-5 rotate-12 pointer-events-none group-hover:scale-110 transition-transform duration-500">
+            <span class="material-symbols-outlined text-[120px]" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+        </div>
+        <p class="text-label-sm font-label-sm text-on-surface-variant mb-2">Unlimited Access</p>
+        <p class="text-[11px] text-white/50 mb-4 leading-snug">Curate AI-driven custom feeds in gorgeous 4K masters.</p>
+        <button class="w-full py-2 bg-on-tertiary-container text-white rounded-lg font-bold text-label-sm active:scale-95 transition-all hover:bg-red-700 hover:shadow-lg hover:shadow-on-tertiary-container/30">
+            Upgrade to Pro
+        </button>
+    </div>
+</aside>
+
+<!-- TopNavBar Component -->
+<header class="sticky top-0 z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 w-full bg-surface/80 backdrop-blur-md shadow-sm border-b border-white/10 md:ml-64 md:w-[calc(100%-16rem)]">
+    <!-- Mobile Brand Logo -->
+    <div class="md:hidden flex items-center gap-2">
+        <span class="material-symbols-outlined text-on-tertiary-container">movie</span>
+        <span class="font-display-lg text-[24px] text-on-surface tracking-wider">CineMatch</span>
+    </div>
+    
+    <!-- Desktop Search Field -->
+    <div class="hidden md:flex flex-1 max-w-xl relative">
+        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+        <form action="/" method="POST" class="w-full">
+            <input name="search_q" class="w-full bg-surface-container-high border-none rounded-full pl-12 pr-4 py-2 text-body-md focus:ring-2 focus:ring-on-tertiary-container focus:outline-none transition-all placeholder-outline text-on-surface" placeholder="Search netflix films, genres, plots..." type="text"/>
+        </form>
+    </div>
+    
+    <!-- Right Actions -->
+    <div class="flex items-center gap-4 md:gap-6">
+        <button class="text-on-surface-variant hover:text-on-surface active:scale-95 transition-all relative">
+            <span class="material-symbols-outlined">notifications</span>
+            <span class="absolute top-0 right-0 w-2.5 h-2.5 bg-on-tertiary-container rounded-full ring-2 ring-background"></span>
+        </button>
+        <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-on-tertiary-container cursor-pointer active:scale-95 transition-all">
+            <img alt="User profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJy4bKNMt0OtqnJS5KqoRR5l7g7Faa0kRPXKnLjwhOpy8cGdoad9GIqZ0LoK_yujheYUXc88Zzp_y7DkG-PJHb5wIbKrd-J7GlPTzJ5GG-jf7IS4NGLuGwjWBVk75vbxB7MWN_UrFqu8kZ1TMI43vfDsD8p-yJCS1U7ZTyJbs6a5cfzuyQ6L5eB1rrXnY-FUsMH_aHiVFCiQNReuxfSWNseB5GqKes_11FMuTYbTZfy0Gldkqz_UMiumwuuikkVxTPfjDXzApte4cA"/>
+        </div>
+    </div>
+</header>
+
+<!-- Main Page Shell Content -->
+<main class="md:ml-64 min-h-screen">
+    {% block content %}{% endblock %}
+</main>
+
+<!-- Mobile Bottom Navigation Shell -->
+<nav class="fixed bottom-0 left-0 w-full bg-surface/90 backdrop-blur-xl border-t border-white/5 flex justify-around items-center py-3 z-50 md:hidden">
+    <a class="flex flex-col items-center gap-1 {% if active_page == 'home' %}text-on-tertiary-container{% else %}text-on-surface-variant hover:text-on-surface{% endif %}" href="/">
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' {% if active_page == 'home' %}1{% else %}0{% endif %};">home</span>
+        <span class="text-[10px] {% if active_page == 'home' %}font-bold{% else %}font-medium{% endif %}">Home</span>
+    </a>
+    <a class="flex flex-col items-center gap-1 {% if active_page == 'genres' %}text-on-tertiary-container{% else %}text-on-surface-variant hover:text-on-surface{% endif %}" href="/genres">
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' {% if active_page == 'genres' %}1{% else %}0{% endif %};">movie_filter</span>
+        <span class="text-[10px] {% if active_page == 'genres' %}font-bold{% else %}font-medium{% endif %}">Explore</span>
+    </a>
+    <a class="flex flex-col items-center gap-1 {% if active_page == 'eras' %}text-on-tertiary-container{% else %}text-on-surface-variant hover:text-on-surface{% endif %}" href="/eras">
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' {% if active_page == 'eras' %}1{% else %}0{% endif %};">history_toggle_off</span>
+        <span class="text-[10px] {% if active_page == 'eras' %}font-bold{% else %}font-medium{% endif %}">Eras</span>
+    </a>
+    <a class="flex flex-col items-center gap-1 {% if active_page == 'watchlist' %}text-on-tertiary-container{% else %}text-on-surface-variant hover:text-on-surface{% endif %}" href="/watchlist">
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' {% if active_page == 'watchlist' %}1{% else %}0{% endif %};">bookmark</span>
+        <span class="text-[10px] {% if active_page == 'watchlist' %}font-bold{% else %}font-medium{% endif %}">Saved</span>
+    </a>
+</nav>
+
+<!-- Shared Client-side Javascript Layers -->
+<script>
+    // Watchlist state manager utilizing localStorage
+    const CineWatchlist = {
+        STORAGE_KEY: "cinematch_saved_titles",
+        HISTORY_KEY: "cinematch_watching_history",
+
+        get() {
+            try {
+                return JSON.parse(localStorage.getItem(this.STORAGE_KEY)) || [];
+            } catch(e) {
+                return [];
+            }
+        },
+
+        add(movie) {
+            let list = this.get();
+            if (!list.some(m => m.title === movie.title)) {
+                list.push(movie);
+                localStorage.setItem(this.STORAGE_KEY, JSON.stringify(list));
+            }
+            this.updateBadge();
+            this.dispatchEvent();
+        },
+
+        remove(title) {
+            let list = this.get();
+            list = list.filter(m => m.title !== title);
+            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(list));
+            this.updateBadge();
+            this.dispatchEvent();
+        },
+
+        has(title) {
+            return this.get().some(m => m.title === title);
+        },
+
+        updateBadge() {
+            const count = this.get().length;
+            const badge = document.getElementById("nav-watchlist-count");
+            if (badge) {
+                if (count > 0) {
+                    badge.textContent = count;
+                    badge.classList.remove("hidden");
+                } else {
+                    badge.classList.add("hidden");
+                }
+            }
+        },
+
+        dispatchEvent() {
+            window.dispatchEvent(new Event("cinematch_watchlist_changed"));
+        },
+
+        // Pick up where you left off history simulator
+        getHistory() {
+            try {
+                let hist = JSON.parse(localStorage.getItem(this.HISTORY_KEY));
+                if (!hist) {
+                    // Seed initial demo records so watchlist has default continuations as shown in Stitch Mockup
+                    hist = [
+                        {
+                            title: "Neon Horizon",
+                            genres: "Sci-Fi",
+                            progress: 72,
+                            remaining: "42m remaining",
+                            img: "https://lh3.googleusercontent.com/aida-public/AB6AXuBVUFYig3lxIr-6fK-IZuDn4NaOF1i_k4cbtyIS-040F2mFNss563xI0CiUEIbTmdQ_p92403-UMpdqIS1xlu6k4UbIiXjNTkLCkzUjOZknJ3LMMebST_EIpKLz2mF3u74LqN8G7AaVf3crgAkn7TijWg6Zchvf-aQ_PgFrsIoX9jD2w2Z3VuL-h3nzbQKhSiB2LLC7rDr_nBFyMWqr6mEV-Lca-s09n9Xe4TiBbSAADG9AUOiZ4nilgzOLnw_YTnOaIS5W4C0JJ80n",
+                            episode: "S1 : E4"
+                        },
+                        {
+                            title: "The Last Reel",
+                            genres: "Documentary",
+                            progress: 15,
+                            remaining: "1h 14m remaining",
+                            img: "https://lh3.googleusercontent.com/aida-public/AB6AXuBv703QE8P7S9oOUFJbhKTgASaWKOMSkZxvwzAe1x7ZMfh70zgbYh-kfuAWlzC_mTJ2Mzn0s6Rq9tBhOnTRyenfD3pTb27QivvEnxXEk16P-4gaAINehLDi5KSKY4pFLszJ1yRizjdAFP_NeHQe17llom0ve8mHpZp_F_AjELphJYqOWXrydG8rWdIKdHOOcxfzw0fl7f3VvPdsGc8tPunbE2foyoGUz23DT0A_5MLY9rq97Tspd8f1GFuWoo0S8peQh33TaLZe2XtM"
+                        }
+                    ];
+                    localStorage.setItem(this.HISTORY_KEY, JSON.stringify(hist));
+                }
+                return hist;
+            } catch(e) {
+                return [];
+            }
+        }
+    };
+
+    // Initialize badges
+    document.addEventListener("DOMContentLoaded", () => {
+        CineWatchlist.updateBadge();
+    });
+
+    // Horizontal slider scroll handler
+    function initCarousels() {
+        document.querySelectorAll('.no-scrollbar').forEach(carousel => {
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+
+            carousel.addEventListener('mousedown', (e) => {
+                isDown = true;
+                carousel.classList.add('active');
+                startX = e.pageX - carousel.offsetLeft;
+                scrollLeft = carousel.scrollLeft;
+            });
+            carousel.addEventListener('mouseleave', () => {
+                isDown = false;
+            });
+            carousel.addEventListener('mouseup', () => {
+                isDown = false;
+            });
+            carousel.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - carousel.offsetLeft;
+                const walk = (x - startX) * 2;
+                carousel.scrollLeft = scrollLeft - walk;
+            });
+        });
+    }
+    
+    document.addEventListener("DOMContentLoaded", initCarousels);
+</script>
+</body>
+</html>

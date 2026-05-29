@@ -47,6 +47,7 @@ def init_netflix_db():
                         if seasons:
                             runtime = int(seasons[0]) * 45 # approximating 45 mins per episode
                 
+                
                 # 2. Dynamic iteration shifting baseline score
                 base_rating = round((base_rating + 0.1) if base_rating < 9.4 else 6.1, 1)
                 

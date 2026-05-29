@@ -1,570 +1,220 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Movie Expert Recommender — Cinematic Edition</title>
-    <style>
-        /* Strict Official Netflix Branding Colors Only */
-        :root {
-            --bg: #141414;
-            --surface: #181818;
-            --input-bg: rgba(255, 255, 255, 0.02);
-            --dropdown-overlay: #222222;
-            --border: #333333;
-            --netflix-red: #E50914;
-            --netflix-red-glow: rgba(229, 9, 20, 0.45);
-            --netflix-shadow-heavy: rgba(229, 9, 20, 0.25);
-            --text-main: #FFFFFF;
-            --text-muted: #808080;
-        }
+{% extends "layout.html" %}
 
-        body { 
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; 
-            background: var(--bg);
-            color: var(--text-main); 
-            padding: 60px 20px;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
-            position: relative;
-            overflow-x: hidden;
-        }
+{% block title %}CineMatch | Premium discovery{% endblock %}
 
-        .portfolio-container {
-            width: 100%;
-            max-width: 1100px;
-            position: relative;
-            z-index: 10;
-        }
+{% block extra_head %}
+<style>
+    /* Sweeping Red Laser Ray border highlight */
+    .movie-row::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        background: linear-gradient(90deg, transparent, #E50914, transparent) border-box;
+        -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: destination-out;
+        mask-composite: exclude;
+        background-size: 200% 100%;
+        background-position: 200% center;
+        transition: opacity 0.3s;
+        opacity: 0;
+        pointer-events: none;
+    }
 
-        /* Hero Header with Reveal Transitions */
-        header {
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 35px;
-            margin-bottom: 50px;
-            animation: headerFadeIn 1s cubic-bezier(0.16, 1, 0.3, 1);
-        }
+    .movie-row:hover::after {
+        opacity: 1;
+        animation: borderLaser 1.5s linear infinite;
+    }
 
-        @keyframes headerFadeIn {
-          from { opacity: 0; transform: translateY(-10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
+    @keyframes borderLaser {
+        0% { background-position: 200% center; }
+        100% { background-position: -200% center; }
+    }
+</style>
+{% endblock %}
 
-        .hero-title {
-            font-size: clamp(2.5rem, 7vw, 5.5rem);
-            font-weight: 900;
-            text-transform: uppercase;
-            line-height: 0.95;
-            letter-spacing: -0.04em;
-            margin: 0 0 15px 0;
-        }
-
-        .hero-subtitle {
-            font-size: 13px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: var(--netflix-red);
-        }
-
-        /* Interactive Radar Pulse Auras */
-        .live-dot {
-            width: 8px;
-            height: 8px;
-            background-color: var(--netflix-red);
-            border-radius: 50%;
-            display: inline-block;
-            position: relative;
-        }
-
-        .live-dot::after {
-            content: "";
-            position: absolute;
-            top: -4px; left: -4px; width: 16px; height: 16px;
-            border: 1px solid var(--netflix-red);
-            border-radius: 50%;
-            animation: radarPulse 1.5s infinite linear;
-        }
-
-        @keyframes radarPulse {
-            0% { transform: scale(0.6); opacity: 1; }
-            100% { transform: scale(1.8); opacity: 0; }
-        }
-
-        /* 2-Column Main Panel Form Grid (Left: Genres | Right: Stacked Industry, Era, Runtime) */
-        .form-panel { 
-            display: grid;
-            grid-template-columns: 1.2fr 1fr;
-            gap: 40px;
-            padding: 35px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
-            margin-bottom: 50px;
-            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-
-        .form-panel:hover {
-            border-color: rgba(229, 9, 20, 0.25);
-            box-shadow: 0 20px 40px var(--netflix-shadow-heavy);
-        }
-
-        /* Right side stack container to perfectly optimize space beneath 02 and 03 */
-        .right-stack-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
-
-        .filter-section {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .filter-section h3 {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            color: var(--text-muted);
-            margin: 0 0 15px 0;
-            transition: color 0.3s;
-        }
-
-        .form-panel:hover h3 {
-            color: var(--text-main);
-        }
-
-        .genre-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        /* Unified Layout Box System */
-        .genre-item, .select-wrapper-box {
-            display: flex;
-            align-items: center;
-            padding: 14px 16px;
-            background: var(--input-bg);
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            font-size: 14px;
-            color: #d1d1d6;
-            cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-
-        .genre-item:hover, .select-wrapper-box:hover {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: var(--netflix-red);
-            box-shadow: 0 4px 15px var(--netflix-red-glow);
-            transform: translateY(-2px);
-        }
-
-        .genre-item input {
-            appearance: none;
-            width: 16px;
-            height: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            background: transparent;
-            margin-right: 12px;
-            cursor: pointer;
-            position: relative;
-            border-radius: 2px;
-            transition: all 0.2s;
-        }
-
-        .genre-item input:checked {
-            background: var(--netflix-red);
-            border-color: var(--netflix-red);
-            box-shadow: 0 0 10px var(--netflix-red-glow);
-        }
-
-        /* Fixed Custom Native-Bypassing Dropdown Design */
-        select {
-            width: 100%;
-            background: transparent;
-            color: var(--text-main);
-            border: none;
-            outline: none;
-            font-size: 14px;
-            letter-spacing: 0.05em;
-            cursor: pointer;
-            padding: 0;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-        }
-
-        /* FIX: Styling dropdown popover options container to keep background dark and text readable */
-        select option {
-            background-color: var(--dropdown-overlay);
-            color: var(--text-main);
-            padding: 12px;
-            font-size: 14px;
-            border: none;
-        }
-
-        .select-wrapper-box {
-            position: relative;
-            padding-right: 35px;
-        }
-
-        /* Custom Animated Dropdown Indicator Arrow */
-        .select-wrapper-box::after {
-            content: "▼";
-            font-size: 10px;
-            color: var(--text-muted);
-            position: absolute;
-            right: 16px;
-            pointer-events: none;
-            transition: transform 0.3s ease, color 0.3s ease;
-        }
-
-        .select-wrapper-box:hover::after {
-            color: var(--netflix-red);
-            transform: rotate(180deg); /* Blends fluidly with exterior laser mechanics */
-        }
-
-        /* Slider Controls Interface Section */
-        .slider-container {
-            background: var(--input-bg);
-            border: 1px solid var(--border);
-            padding: 22px;
-            border-radius: 4px;
-            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-
-        .slider-container:hover {
-            border-color: var(--netflix-red);
-            box-shadow: 0 6px 16px var(--netflix-red-glow);
-            transform: translateY(-2px);
-        }
-
-        input[type="range"] {
-            width: 100%;
-            accent-color: var(--netflix-red);
-            background: var(--border);
-            height: 4px;
-            margin: 15px 0;
-            cursor: pointer;
-        }
-
-        .slider-meta {
-            display: flex;
-            justify-content: space-between;
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-
-        .slider-value {
-            color: var(--netflix-red);
-            font-weight: bold;
-            letter-spacing: 0.05em;
-        }
-
-        /* Action Button Layout Box */
-        .submit-wrapper {
-            grid-column: 1 / -1;
-            display: flex;
-            justify-content: flex-start;
-            position: relative;
-            margin-top: 10px;
-        }
-
-        input[type="submit"] { 
-            background: var(--netflix-red);
-            color: var(--text-main); 
-            border: none; 
-            padding: 18px 44px; 
-            font-size: 14px;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            cursor: pointer; 
-            border-radius: 4px;
-            position: relative;
-            z-index: 5;
-            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-
-        input[type="submit"]:hover {
-            background: #b80710;
-            box-shadow: 0 0 30px rgba(229, 9, 20, 0.85);
-            transform: scale(1.03) translateY(-2px);
-        }
-
-        /* Output Container Layer */
-        .results-container {
-            margin-top: 60px;
-        }
-
-        .section-header {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.25em;
-            color: var(--text-muted);
-            margin-bottom: 30px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .section-header::after {
-            content: "";
-            flex-grow: 1;
-            height: 1px;
-            background: var(--border);
-        }
-
-        .movies-list {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        /* Staggered load animation rows structure */
-        .movie-row {
-            display: grid;
-            grid-template-columns: 2.5fr 1fr 1fr 0.8fr;
-            gap: 24px;
-            padding: 26px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            align-items: center;
-            position: relative;
-            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-            
-            opacity: 0;
-            transform: translateY(20px);
-            animation: cardReveal 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
-        }
-
-        @keyframes cardReveal {
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .movie-row:nth-child(1) { animation-delay: 0.05s; }
-        .movie-row:nth-child(2) { animation-delay: 0.10s; }
-        .movie-row:nth-child(3) { animation-delay: 0.15s; }
-        .movie-row:nth-child(4) { animation-delay: 0.20s; }
-        .movie-row:nth-child(5) { animation-delay: 0.25s; }
-        .movie-row:nth-child(6) { animation-delay: 0.30s; }
-        .movie-row:nth-child(7) { animation-delay: 0.35s; }
-        .movie-row:nth-child(8) { animation-delay: 0.40s; }
-
-        /* Sweeping Red Light Ray Laser Border Highlight on Hover */
-        .movie-row::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            border: 1px solid transparent;
-            border-radius: 4px;
-            background: linear-gradient(90deg, transparent, var(--netflix-red), transparent) border-box;
-            -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: destination-out;
-            mask-composite: exclude;
-            background-size: 200% 100%;
-            background-position: 200% center;
-            transition: opacity 0.3s;
-            opacity: 0;
-        }
-
-        .movie-row:hover {
-            background: #222222;
-            border-color: var(--netflix-red);
-            box-shadow: 0 15px 35px var(--netflix-shadow-heavy);
-            transform: scale(1.015) translateY(-3px);
-        }
-
-        .movie-row:hover::after {
-            opacity: 1;
-            animation: borderLaser 1.2s linear infinite;
-        }
-
-        @keyframes borderLaser {
-            0% { background-position: 200% center; }
-            100% { background-position: -200% center; }
-        }
-
-        .movie-main h4 {
-            margin: 0 0 10px 0;
-            font-size: 24px;
-            font-weight: 800;
-            letter-spacing: -0.02em;
-            color: #ffffff;
-        }
-
-        .movie-plot {
-            font-size: 14px;
-            color: #999999;
-            line-height: 1.6;
-            margin: 0;
-            max-width: 530px;
-        }
-
-        .movie-meta {
-            font-size: 14px;
-            color: #e5e5ea;
-        }
-
-        .movie-type-badge {
-            font-size: 10px;
-            text-transform: uppercase;
-            background: #333333;
-            border: 1px solid #444444;
-            color: #ffffff;
-            padding: 4px 10px;
-            border-radius: 2px;
-            font-weight: 800;
-            display: inline-block;
-            margin-bottom: 8px;
-            letter-spacing: 0.08em;
-        }
-
-        .movie-genres {
-            font-size: 13px;
-            color: var(--text-muted);
-            line-height: 1.5;
-        }
-
-        .movie-match {
-            text-align: right;
-            font-size: 14px;
-            font-weight: 900;
-            letter-spacing: 0.08em;
-            color: #46d369;
-        }
-
-        .no-results {
-            padding: 50px;
-            color: var(--text-muted);
-            font-size: 14px;
-            text-align: center;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 4px;
-        }
-
-        @media (max-width: 768px) {
-            .form-panel {
-                grid-template-columns: 1fr;
-            }
-            .movie-row {
-                grid-template-columns: 1fr;
-                gap: 18px;
-                padding: 22px;
-            }
-            .movie-match {
-                text-align: left;
-                border-top: 1px solid var(--border);
-                padding-top: 14px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="portfolio-container">
+{% block content %}
+<!-- Cinematic Hero Banner Section -->
+<section class="relative w-full aspect-[16/9] md:aspect-[21/9] flex items-end overflow-hidden">
+    <div class="absolute inset-0 z-0">
+        <img class="w-full h-full object-cover select-none transition-transform duration-[10s] ease-out scale-105" id="hero-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBN_A_7vsgIFE4CGanYJ_rrLtdAjGmgy-2ydTNA1zfg-V3DmvHu558y5xor194hs66_d4LYiDkOewvIjzZdOWr4BGhriJ1Osq1lNO1eALzWzJloQv_cLF-AOSqqzwy9m6kBtVXuh4Pr_ijNrrnyk1QUOk0oN_NsQtilACWGDHnPQxmgbcmm4MLq-1rpiMDM2bGvjzpSAtk2TlJUApOeQF7gmMer6Khvwse2gAPmlilygvGzNEwlcP4RBALg55Er_OR6M7YG9kCHwFAk" alt="Futuristic Cityscape"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-background via-transparent to-transparent"></div>
+    </div>
+    
+    <div class="relative z-10 px-margin-mobile md:px-margin-desktop pb-12 w-full max-w-4xl">
+        <div class="flex items-center gap-3 mb-4">
+            <span class="px-3 py-1 bg-on-tertiary-container text-white text-[10px] font-extrabold rounded-full uppercase tracking-widest shadow-md">Top Match for You</span>
+            <span class="text-on-tertiary-container font-extrabold text-title-md text-glow">{{ hero_movie.match }}% Match</span>
+        </div>
+        <h2 class="font-display-lg text-[48px] md:text-[72px] leading-[0.9] text-on-surface mb-4 uppercase tracking-tighter">{{ hero_movie.title }}</h2>
+        <p class="text-on-surface-variant font-body-md max-w-xl mb-8 line-clamp-3 leading-relaxed">{{ hero_movie.plot }}</p>
         
-        <header>
-            <h1 class="hero-title">Movie Expert<br>Recommender</h1>
-            <p class="hero-subtitle"><span class="live-dot"></span> The cure for "What should we watch?"</p>
-        </header>
-        
+        <div class="flex flex-wrap gap-4">
+            <button onclick="alert('Starting dynamic high-fidelity playback of {{ hero_movie.title }}...')" class="px-8 py-4 bg-on-surface text-background hover:bg-white rounded-lg font-extrabold flex items-center gap-2 active:scale-95 transition-all shadow-lg hover:shadow-white/10">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+                WATCH NOW
+            </button>
+            <button id="hero-watchlist-btn" onclick="toggleHeroWatchlist()" class="px-8 py-4 bg-white/10 backdrop-blur-md text-white border border-white/20 hover:bg-white/20 rounded-lg font-extrabold flex items-center gap-2 active:scale-95 transition-all">
+                <span class="material-symbols-outlined" id="hero-watchlist-icon">add</span>
+                <span id="hero-watchlist-text">WATCHLIST</span>
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- Content Panel & Curated Discovery -->
+<div class="px-margin-mobile md:px-margin-desktop py-12 space-y-12">
+    
+    <!-- 2-Column Main Panel Form Grid (Left: Mood Filters | Right: Era, Industry, Runtime) -->
+    <section class="max-w-container-max-width mx-auto">
         <form method="POST">
-            <div class="form-panel">
-                <div class="filter-section">
-                    <h3>01 / Mood Genres</h3>
-                    <div class="genre-grid">
-                        <label class="genre-item"><input type="checkbox" name="genres" value="Sci-Fi">Sci-Fi</label>
-                        <label class="genre-item"><input type="checkbox" name="genres" value="Thriller">Thriller</label>
-                        <label class="genre-item"><input type="checkbox" name="genres" value="Action">Action</label>
-                        <label class="genre-item"><input type="checkbox" name="genres" value="Comedies">Comedy</label>
-                        <label class="genre-item"><input type="checkbox" name="genres" value="Dramas">Drama</label>
-                        <label class="genre-item"><input type="checkbox" name="genres" value="Horror">Horror</label>
-                        <label class="genre-item"><input type="checkbox" name="genres" value="Documentaries">Documentary</label>
-                        <label class="genre-item"><input type="checkbox" name="genres" value="Romantic">Romance</label>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 p-6 md:p-8 bg-surface-container-low border border-white/5 rounded-xl shadow-2xl transition-all duration-500 hover:border-on-tertiary-container/20 hover:shadow-on-tertiary-container/5">
+                
+                <!-- Left Column: Mood Genres -->
+                <div class="space-y-6">
+                    <div class="flex items-center gap-3">
+                        <span class="text-on-tertiary-container font-extrabold text-title-md">01 /</span>
+                        <h3 class="text-on-surface font-title-md uppercase tracking-wider">Mood Genres</h3>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <label class="flex items-center gap-3 p-4 bg-white/5 border border-white/5 hover:border-on-tertiary-container hover:bg-white/10 hover:-translate-y-0.5 rounded-lg cursor-pointer transition-all duration-200 text-on-surface">
+                            <input class="appearance-none w-5 h-5 border border-white/30 rounded checked:bg-on-tertiary-container checked:border-on-tertiary-container checked:shadow-lg checked:shadow-on-tertiary-container/30 focus:ring-0 cursor-pointer transition-all" type="checkbox" name="genres" value="Sci-Fi"/>
+                            <span class="text-sm font-semibold">Sci-Fi</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-4 bg-white/5 border border-white/5 hover:border-on-tertiary-container hover:bg-white/10 hover:-translate-y-0.5 rounded-lg cursor-pointer transition-all duration-200 text-on-surface">
+                            <input class="appearance-none w-5 h-5 border border-white/30 rounded checked:bg-on-tertiary-container checked:border-on-tertiary-container checked:shadow-lg checked:shadow-on-tertiary-container/30 focus:ring-0 cursor-pointer transition-all" type="checkbox" name="genres" value="Thriller"/>
+                            <span class="text-sm font-semibold">Thriller</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-4 bg-white/5 border border-white/5 hover:border-on-tertiary-container hover:bg-white/10 hover:-translate-y-0.5 rounded-lg cursor-pointer transition-all duration-200 text-on-surface">
+                            <input class="appearance-none w-5 h-5 border border-white/30 rounded checked:bg-on-tertiary-container checked:border-on-tertiary-container checked:shadow-lg checked:shadow-on-tertiary-container/30 focus:ring-0 cursor-pointer transition-all" type="checkbox" name="genres" value="Action"/>
+                            <span class="text-sm font-semibold">Action</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-4 bg-white/5 border border-white/5 hover:border-on-tertiary-container hover:bg-white/10 hover:-translate-y-0.5 rounded-lg cursor-pointer transition-all duration-200 text-on-surface">
+                            <input class="appearance-none w-5 h-5 border border-white/30 rounded checked:bg-on-tertiary-container checked:border-on-tertiary-container checked:shadow-lg checked:shadow-on-tertiary-container/30 focus:ring-0 cursor-pointer transition-all" type="checkbox" name="genres" value="Comedies"/>
+                            <span class="text-sm font-semibold">Comedy</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-4 bg-white/5 border border-white/5 hover:border-on-tertiary-container hover:bg-white/10 hover:-translate-y-0.5 rounded-lg cursor-pointer transition-all duration-200 text-on-surface">
+                            <input class="appearance-none w-5 h-5 border border-white/30 rounded checked:bg-on-tertiary-container checked:border-on-tertiary-container checked:shadow-lg checked:shadow-on-tertiary-container/30 focus:ring-0 cursor-pointer transition-all" type="checkbox" name="genres" value="Dramas"/>
+                            <span class="text-sm font-semibold">Drama</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-4 bg-white/5 border border-white/5 hover:border-on-tertiary-container hover:bg-white/10 hover:-translate-y-0.5 rounded-lg cursor-pointer transition-all duration-200 text-on-surface">
+                            <input class="appearance-none w-5 h-5 border border-white/30 rounded checked:bg-on-tertiary-container checked:border-on-tertiary-container checked:shadow-lg checked:shadow-on-tertiary-container/30 focus:ring-0 cursor-pointer transition-all" type="checkbox" name="genres" value="Horror"/>
+                            <span class="text-sm font-semibold">Horror</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-4 bg-white/5 border border-white/5 hover:border-on-tertiary-container hover:bg-white/10 hover:-translate-y-0.5 rounded-lg cursor-pointer transition-all duration-200 text-on-surface">
+                            <input class="appearance-none w-5 h-5 border border-white/30 rounded checked:bg-on-tertiary-container checked:border-on-tertiary-container checked:shadow-lg checked:shadow-on-tertiary-container/30 focus:ring-0 cursor-pointer transition-all" type="checkbox" name="genres" value="Documentaries"/>
+                            <span class="text-sm font-semibold">Documentary</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-4 bg-white/5 border border-white/5 hover:border-on-tertiary-container hover:bg-white/10 hover:-translate-y-0.5 rounded-lg cursor-pointer transition-all duration-200 text-on-surface">
+                            <input class="appearance-none w-5 h-5 border border-white/30 rounded checked:bg-on-tertiary-container checked:border-on-tertiary-container checked:shadow-lg checked:shadow-on-tertiary-container/30 focus:ring-0 cursor-pointer transition-all" type="checkbox" name="genres" value="Romantic"/>
+                            <span class="text-sm font-semibold">Romance</span>
+                        </label>
                     </div>
                 </div>
-
-                <div class="right-stack-panel">
-                    <div class="filter-section">
-                        <h3>02 / Film Industry</h3>
-                        <div class="select-wrapper-box">
-                            <select name="industry">
-                                <option value="All">All Regions (Global)</option>
-                                <option value="Hollywood">Hollywood (Western)</option>
-                                <option value="Bollywood">Bollywood (Indian)</option>
+                
+                <!-- Right Column: Industry, Era, Runtime -->
+                <div class="flex flex-col gap-6">
+                    
+                    <!-- Industry -->
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3">
+                            <span class="text-on-tertiary-container font-extrabold text-title-md">02 /</span>
+                            <h3 class="text-on-surface font-title-md uppercase tracking-wider">Film Industry</h3>
+                        </div>
+                        <div class="relative bg-white/5 border border-white/5 hover:border-on-tertiary-container rounded-lg p-3 transition-colors duration-200">
+                            <select name="industry" class="w-full bg-transparent border-none text-on-surface text-sm focus:ring-0 focus:outline-none cursor-pointer">
+                                <option value="All" class="bg-surface-container-high text-on-surface">All Regions (Global)</option>
+                                <option value="Hollywood" class="bg-surface-container-high text-on-surface">Hollywood (Western)</option>
+                                <option value="Bollywood" class="bg-surface-container-high text-on-surface">Bollywood (Indian)</option>
                             </select>
                         </div>
                     </div>
                     
-                    <div class="filter-section">
-                        <h3>03 / Release Era</h3>
-                        <div class="select-wrapper-box">
-                            <select name="era">
-                                <option value="Modern">Modern (&ge; 2010)</option>
-                                <option value="2000s">2000s (2000 - 2009)</option>
-                                <option value="90s">1990s (1990 - 1999)</option>
-                                <option value="Classic">Classic (&lt; 1990)</option>
+                    <!-- Release Era -->
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3">
+                            <span class="text-on-tertiary-container font-extrabold text-title-md">03 /</span>
+                            <h3 class="text-on-surface font-title-md uppercase tracking-wider">Release Era</h3>
+                        </div>
+                        <div class="relative bg-white/5 border border-white/5 hover:border-on-tertiary-container rounded-lg p-3 transition-colors duration-200">
+                            <select name="era" class="w-full bg-transparent border-none text-on-surface text-sm focus:ring-0 focus:outline-none cursor-pointer">
+                                <option value="Modern" class="bg-surface-container-high text-on-surface">Modern (&ge; 2010)</option>
+                                <option value="2000s" class="bg-surface-container-high text-on-surface">2000s (2000 - 2009)</option>
+                                <option value="90s" class="bg-surface-container-high text-on-surface">1990s (1990 - 1999)</option>
+                                <option value="Classic" class="bg-surface-container-high text-on-surface">Classic (&lt; 1990)</option>
                             </select>
                         </div>
                     </div>
                     
-                    <div class="filter-section">
-                        <h3>04 / Runtime Boundary</h3>
-                        <div class="slider-container">
-                            <div class="slider-meta">
+                    <!-- Runtime Slider -->
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3">
+                            <span class="text-on-tertiary-container font-extrabold text-title-md">04 /</span>
+                            <h3 class="text-on-surface font-title-md uppercase tracking-wider">Runtime Boundary</h3>
+                        </div>
+                        <div class="bg-white/5 border border-white/5 hover:border-on-tertiary-container p-5 rounded-lg transition-all duration-300">
+                            <div class="flex justify-between items-center text-sm mb-2 text-on-surface-variant">
                                 <span>Max Duration</span>
-                                <span class="slider-value"><span id="range-val">150</span> mins</span>
+                                <span class="text-on-tertiary-container font-extrabold tracking-wider"><span id="range-val">150</span> mins</span>
                             </div>
-                            <input type="range" name="runtime" min="45" max="240" value="150" oninput="document.getElementById('range-val').innerText = this.value">
+                            <input class="w-full accent-on-tertiary-container cursor-pointer bg-white/10 h-1.5 rounded-full" type="range" name="runtime" min="45" max="240" value="150" oninput="document.getElementById('range-val').innerText = this.value"/>
                         </div>
                     </div>
                 </div>
                 
-                <div class="submit-wrapper">
-                    <input type="submit" value="RECOMMENDED MOVIES">
+                <!-- Action Submit Button -->
+                <div class="lg:col-span-2 pt-4 flex justify-start">
+                    <button type="submit" class="px-10 py-4 bg-on-tertiary-container hover:bg-red-700 text-white font-extrabold text-sm uppercase tracking-widest rounded-lg transition-all shadow-lg hover:shadow-on-tertiary-container/30 active:scale-95">
+                        RECOMMENDED MOVIES
+                    </button>
                 </div>
             </div>
         </form>
+    </section>
 
-        {% if results is not none %}
-            <div class="results-container" id="results-target">
-                <div class="section-header">Identified Recommendation Set</div>
-                <div class="movies-list">
-                    {% for movie in results %}
-                        <div class="movie-row">
-                            <div class="movie-main">
-                                <h4>{{ movie.title }}</h4>
-                                <p class="movie-plot">{{ movie.plot }}</p>
-                            </div>
-                            <div class="movie-meta">
-                                <span class="movie-type-badge">{{ movie.type }}</span>
-                                <div style="font-weight: 700; margin-bottom: 4px; font-size: 16px;">{{ movie.year }}</div>
-                                <div style="color: var(--text-muted); font-weight: 500;">⭐ {{ movie.rating }} / 10</div>
-                            </div>
-                            <div class="movie-row-genres" style="font-size: 13px; color: var(--text-muted);">
-                                {{ movie.genres }}
-                            </div>
-                            <div class="movie-match">
-                                [// {{ movie.match }}% MATCH]
-                            </div>
+    <!-- Search Results / Match Outputs -->
+    {% if results is not none %}
+        <section class="max-w-container-max-width mx-auto pt-6" id="results-target">
+            <div class="flex items-center gap-4 mb-8">
+                <h3 class="font-headline-lg text-headline-lg text-on-surface">Identified Recommendation Set</h3>
+                <div class="flex-grow h-px bg-white/10"></div>
+                {% if results|length > 0 %}
+                    <span class="bg-white/5 text-on-surface-variant px-3 py-1 rounded text-xs border border-white/5 font-semibold">FOUND {{ results|length }} MATCHES</span>
+                {% endif %}
+            </div>
+            
+            <div class="movies-list space-y-4">
+                {% for movie in results %}
+                    <div class="movie-row relative grid grid-cols-1 md:grid-cols-[2.5fr_1fr_1fr_0.8fr] gap-6 p-6 bg-surface-container-low border border-white/5 hover:bg-surface-container hover:border-on-tertiary-container rounded-xl items-center transition-all duration-300 hover:shadow-xl hover:shadow-on-tertiary-container/5 hover:-translate-y-1">
+                        <div class="space-y-2">
+                            <h4 class="text-xl md:text-2xl font-extrabold text-white leading-snug">{{ movie.title }}</h4>
+                            <p class="text-sm text-on-surface-variant leading-relaxed max-w-xl">{{ movie.plot }}</p>
                         </div>
-                    {% else %}
-                        <div class="no-results">
-                            No titles isolated within dataset limits matching active industry parameters.
+                        <div class="text-sm text-on-surface">
+                            <span class="text-[10px] text-white bg-white/10 border border-white/20 rounded px-2.5 py-0.5 font-bold uppercase tracking-wider">{{ movie.type }}</span>
+                            <div class="font-extrabold text-lg mt-2">{{ movie.year }}</div>
+                            <div class="text-on-surface-variant font-bold text-xs mt-1">⭐ {{ movie.rating }} / 10</div>
                         </div>
-                    {% endfor %}
-                </div>
+                        <div class="text-xs text-on-surface-variant font-semibold leading-relaxed">
+                            {{ movie.genres }}
+                        </div>
+                        <div class="flex md:flex-col items-center md:items-end justify-between md:justify-center gap-4">
+                            <div class="text-emerald-400 font-extrabold text-sm tracking-wider uppercase">
+                                {{ movie.match }}% Match
+                            </div>
+                            <button onclick="toggleCardWatchlist(this, '{{ movie.title }}', '{{ movie.genres }}', '{{ movie.year }}', '{{ movie.type }}', '{{ movie.rating }}', '{{ movie.plot }}')" class="watchlist-toggle-btn w-10 h-10 rounded-full glass-panel flex items-center justify-center text-white hover:bg-on-tertiary-container transition-all" title="Save to Watchlist">
+                                <span class="material-symbols-outlined text-sm">add</span>
+                            </button>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="p-12 text-center text-on-surface-variant font-medium bg-surface-container-low border border-white/5 rounded-lg shadow-inner">
+                        No netflix titles isolated matching active search queries or industry filters.
+                    </div>
+                {% endfor %}
             </div>
             
             <script>
@@ -573,8 +223,241 @@
                     block: 'start' 
                 });
             </script>
-        {% endif %}
+        </section>
+    {% endif %}
+
+    <!-- Curated shelves displayed when search is not active to look premium -->
+    {% if results is none %}
+        <!-- Recommended For You Shelf -->
+        <section class="pl-4 md:pl-0 max-w-container-max-width mx-auto">
+            <div class="flex justify-between items-end mb-6 pr-margin-mobile md:pr-0">
+                <h3 class="font-headline-lg text-headline-lg text-on-surface tracking-wider">Recommended for You</h3>
+                <a href="/genres" class="text-on-tertiary-container text-label-sm font-bold flex items-center gap-1 hover:underline tracking-widest uppercase">
+                    VIEW ALL <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+                </a>
+            </div>
+            
+            <div class="flex gap-6 overflow-x-auto no-scrollbar pb-6 pl-1 -ml-1">
+                {% for movie in rec_movies %}
+                    <div class="flex-none w-48 md:w-60 group cursor-pointer" onclick="openMovieDetail('{{ movie.title }}', '{{ movie.genres }}', '{{ movie.year }}', '{{ movie.rating }}', '{{ movie.plot }}')">
+                        <div class="relative aspect-[2/3] rounded-xl overflow-hidden mb-3 border border-white/5 shadow-md">
+                            <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 lazy-cover" data-title="{{ movie.title }}" data-genres="{{ movie.genres }}" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 3'%3E%3C/svg%3E" alt="{{ movie.title }}"/>
+                            <div class="absolute top-3 right-3 px-2.5 py-0.5 bg-on-tertiary-container text-white text-[10px] font-extrabold rounded shadow-lg shadow-on-tertiary-container/30 tracking-wider">{{ movie.match }}% MATCH</div>
+                            <div class="absolute inset-0 bg-black/60 flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                <button onclick="event.stopPropagation(); toggleCarouselWatchlist(this, '{{ movie.title }}', '{{ movie.genres }}', '{{ movie.year }}', '{{ movie.type }}', '{{ movie.rating }}', '{{ movie.plot }}')" class="carousel-watchlist-btn w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center hover:bg-on-tertiary-container transition-colors"><span class="material-symbols-outlined text-white text-sm">bookmark</span></button>
+                                <button onclick="event.stopPropagation(); alert('Liking this content helps customize your neural discover feed!')" class="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center hover:bg-emerald-600 transition-colors"><span class="material-symbols-outlined text-white text-sm">thumb_up</span></button>
+                            </div>
+                        </div>
+                        <h4 class="font-title-md text-on-surface truncate pr-2">{{ movie.title }}</h4>
+                        <p class="text-label-sm text-on-surface-variant font-semibold mt-0.5">{{ movie.genres.split(',')[0] }} • {{ movie.year }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Trending Sci-Fi Shelf -->
+        <section class="pl-4 md:pl-0 max-w-container-max-width mx-auto">
+            <div class="flex justify-between items-end mb-6 pr-margin-mobile md:pr-0">
+                <h3 class="font-headline-lg text-headline-lg text-on-surface tracking-wider">Trending in Sci-Fi</h3>
+                <a href="/genres" class="text-on-tertiary-container text-label-sm font-bold flex items-center gap-1 hover:underline tracking-widest uppercase">
+                    VIEW ALL <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+                </a>
+            </div>
+            
+            <div class="flex gap-6 overflow-x-auto no-scrollbar pb-6 pl-1 -ml-1">
+                {% for movie in scifi_movies %}
+                    <div class="flex-none w-48 md:w-60 group cursor-pointer" onclick="openMovieDetail('{{ movie.title }}', '{{ movie.genres }}', '{{ movie.year }}', '{{ movie.rating }}', '{{ movie.plot }}')">
+                        <div class="relative aspect-[2/3] rounded-xl overflow-hidden mb-3 border border-white/5 shadow-md">
+                            <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 lazy-cover" data-title="{{ movie.title }}" data-genres="{{ movie.genres }}" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 3'%3E%3C/svg%3E" alt="{{ movie.title }}"/>
+                            <div class="absolute top-3 right-3 px-2.5 py-0.5 bg-on-tertiary-container text-white text-[10px] font-extrabold rounded shadow-lg tracking-wider">{{ movie.match }}% MATCH</div>
+                            <div class="absolute inset-0 bg-black/60 flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                <button onclick="event.stopPropagation(); toggleCarouselWatchlist(this, '{{ movie.title }}', '{{ movie.genres }}', '{{ movie.year }}', '{{ movie.type }}', '{{ movie.rating }}', '{{ movie.plot }}')" class="carousel-watchlist-btn w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center hover:bg-on-tertiary-container transition-colors"><span class="material-symbols-outlined text-white text-sm">bookmark</span></button>
+                                <button onclick="event.stopPropagation(); alert('Liking content helps customize your discovery feed!')" class="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center hover:bg-emerald-600 transition-colors"><span class="material-symbols-outlined text-white text-sm">thumb_up</span></button>
+                            </div>
+                        </div>
+                        <h4 class="font-title-md text-on-surface truncate pr-2">{{ movie.title }}</h4>
+                        <p class="text-label-sm text-on-surface-variant font-semibold mt-0.5">{{ movie.genres.split(',')[0] }} • {{ movie.year }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Cult Classics 90s Shelf -->
+        <section class="pl-4 md:pl-0 max-w-container-max-width mx-auto">
+            <div class="flex justify-between items-end mb-6 pr-margin-mobile md:pr-0">
+                <h3 class="font-headline-lg text-headline-lg text-on-surface tracking-wider">Cult Classics from the 90s</h3>
+                <a href="/eras" class="text-on-tertiary-container text-label-sm font-bold flex items-center gap-1 hover:underline tracking-widest uppercase">
+                    VIEW ALL <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+                </a>
+            </div>
+            
+            <div class="flex gap-6 overflow-x-auto no-scrollbar pb-6 pl-1 -ml-1">
+                {% for movie in classic_movies %}
+                    <div class="flex-none w-48 md:w-60 group cursor-pointer" onclick="openMovieDetail('{{ movie.title }}', '{{ movie.genres }}', '{{ movie.year }}', '{{ movie.rating }}', '{{ movie.plot }}')">
+                        <div class="relative aspect-[2/3] rounded-xl overflow-hidden mb-3 border border-white/5 shadow-md">
+                            <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 lazy-cover" data-title="{{ movie.title }}" data-genres="{{ movie.genres }}" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 3'%3E%3C/svg%3E" alt="{{ movie.title }}"/>
+                            <div class="absolute top-3 right-3 px-2.5 py-0.5 bg-on-tertiary-container text-white text-[10px] font-extrabold rounded shadow-lg tracking-wider">{{ movie.match }}% MATCH</div>
+                            <div class="absolute inset-0 bg-black/60 flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                <button onclick="event.stopPropagation(); toggleCarouselWatchlist(this, '{{ movie.title }}', '{{ movie.genres }}', '{{ movie.year }}', '{{ movie.type }}', '{{ movie.rating }}', '{{ movie.plot }}')" class="carousel-watchlist-btn w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center hover:bg-on-tertiary-container transition-colors"><span class="material-symbols-outlined text-white text-sm">bookmark</span></button>
+                                <button onclick="event.stopPropagation(); alert('Liking content helps customize your discovery feed!')" class="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center hover:bg-emerald-600 transition-colors"><span class="material-symbols-outlined text-white text-sm">thumb_up</span></button>
+                            </div>
+                        </div>
+                        <h4 class="font-title-md text-on-surface truncate pr-2">{{ movie.title }}</h4>
+                        <p class="text-label-sm text-on-surface-variant font-semibold mt-0.5">{{ movie.genres.split(',')[0] }} • {{ movie.year }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+    {% endif %}
+    
+</div>
+
+<script>
+    // Premium image references retrieved from Stitch Screen Designs
+    const MOVIE_COVERS = [
+        "https://lh3.googleusercontent.com/aida-public/AB6AXuDcBLFcyE8ICfpRTaL5-GfClhYpyPEyo9ndyHZg5_sDGDcyygwGeC6X0zUPBunl2vFWSbScp9zQ0qWvmDcBlPobg4VhVelYisG-0Iz46RISMWRwSDn9TFSYUdNbJgkbB2OzDGk-5MR001tuxdZnwSn1-Pil_jPwqyTwcZ2wh-K9bwEjo99yDBzURnvy-d4tMCKauCSOEp15fd4EDZXNbyUmhZpJf9spScBUJtyAxI3vdJMuLmhXlshUweBpri_P5KvGh7iRy8JQBv7Y",
+        "https://lh3.googleusercontent.com/aida-public/AB6AXuBnSkFTwVnNeWEUQlqKDHTxO-G6t1txS0J2W9ZHBiDYvvnoi-Yf_5IE9qMSRXR8jONoeuy7c8uWF7fD1yPFGUa5gICRjONxZTYFMLCWbIOVtQtpxLE9aQhJ2Xny3PiP1jHGKLhgtGdIsjktWrAbrl_Y3BQF5To--VL4yKuFIuhZ-R-g74R1oPrBJDej7jWMZOfJhWaFRAcHRF8YG2oAcAKlrK9e7ky6gqvJvZQkKh91dCMKZLJi0BsccYarZ30-gtPS_CA9gabvHZ-K",
+        "https://lh3.googleusercontent.com/aida-public/AB6AXuAbDUKMwfhvhw6PKfeKDQNLvVwdCYSVoMrE4iQU6L8g2T_UZ6Xij0OaI8X2oevcefO9buO30xATFMa8orUdfIW6rwTHG7NUKVm2aSXbQNF4AY3T4PCsVHmbk2oJHZV1ut9lkphs9PuS4VyWCXO0zvxKBpLw_gzOWrQ3ITN5QIuZfwgv2wiHDjQWF5z9sYJTosKzOPBSik0Ue481TlhIgYWpSxesvKoca8v1ScTfis5CDX4EJIWxUezDXxYH-zzo7Jq6D6QSqqwHUlLH",
+        "https://lh3.googleusercontent.com/aida-public/AB6AXuAh_PL6qD7RrO1XQ9HWGbJX-022Az3QXcw3fJ5WPTDOK_0DwXVg93qLklvD7oCXOeL4fXjpnVNoERhxmcMQlLs1_v-EoyuFGEWw9UZo36jbFUg0i_skqcldZKkeuSv_RNEuxnslwGa8eTIOvJSvTuxqYrqMjcxXRbFTdWDsM8GnVDEJ71cYTm1ongBVfDdIWDyZCw-wdVjLI09UYX82SpE19QjAQ12XUJZ0cZig5KasjIUTdsLFQu85wULg6Pt2XCK6ZDsApOD8asqC",
+        "https://lh3.googleusercontent.com/aida-public/AB6AXuAwbuH2Mz30edOn4OPSEtuM5zz6ly3GoBrUwyOXbKxlmdTwC3Pl62bqI-e5l8UMk_DFCkrwpoWYNP8CEbkxvnRDkYirvEmTNyKW9q7-8FaqJYFBLiuAgyHjV4tGW62MX_fy6Uiun_ZNiMCvDFil10fnCm0WooSSVT8eePFYBZAIYqcoOapXdHkSA1h7AIeFJ-d0AvPCzA0Zd9suAXTEeFEInl6QfgXIbYMW4Q7t4znfs1LTOUv9ntbMrBJqqQbNV_O43e1CR5_Wzx2M",
+        "https://lh3.googleusercontent.com/aida-public/AB6AXuAq2SqvEmUhfFXNA9kZgf5UTAvi_URttoDHj6l6xpeWhUTnXE_85Qp5QPvKhTminsL-fiDFNE8lqNjJN5WVq8eTrel2xSLBMAsYHRNbx0XHucA3zYMtxuqEm2vgTe6lg2eQAmRaXR_QO1zIqiuKpmJz7m_vudIoCi5bex0xZkCU4CECAyS1_odvddWQrbaZW5zqIFzQfA-CKuYm4-CgfOdPDu7MP_zlSQ3RdEaSEDgdn4oJQndDwm2chJupbytUi7-wQ4bsnLIwRHr9",
+        "https://lh3.googleusercontent.com/aida-public/AB6AXuDO6xUdjI1XmHKbfujEPe6dz7q8Aid7Oq8K1nA81IFlABDS6P0HmtLy0QhU7Q7gg7oEWoTtGEujL41V_h3h1e-KYWxZO-mLIuRU_hMHnZ95w6SYmzl_-Via6B68s_9R2ua_lIOa80_qPhbrzid8-Lmf5FNd7pMFQRQCXuFc2qXiLCvblxwOX3PkcbWkGfsZTInw8h_wAShw4nu30dJbO-k5PMf3FD1lfCr04ZToId7hSi4eWBGykMq1laA3IvkscKbw3kgdbjeTMlC_",
+        "https://lh3.googleusercontent.com/aida-public/AB6AXuDhFivFkkX2i8K98Z36lZ4EjA4eSavXT_4SEILeJuJ-9IFHU3S1AcrMB6IeIgm3IsT0WxJP3uecWDqb-VOHuCKQ_GkgiEZ9BACIMsdXIvbPs6OypY2bO0UmxCxYy8goA09XXnWAPFky5hDMJX_do-QiqjJc80Hj7ZKI_o992cD8uFV0utQ52x0RfL2sd0HXpD3aMx0y-MOdxMeIigzM315F7K1Agk1IC3sWFlkUCL_EaTEUXmxRX2ggG_riDDyMUIDvNAiqNFLyIEok",
+        "https://lh3.googleusercontent.com/aida-public/AB6AXuDw43EkbyZ3Ta6361_ptOTHavzvoAXTdPUpP0ACzJFI6QAV1wl88x56Je_wa8vVRrxxDNuO7luBaiL2VUYMaSZ1j8wgbRvUv7vNa8odiqkhgZA-tF62gxlClm1kCzllfNpi8_L4-GIvvi-LXaoFXBUNUOdQxSv-A_Pr7oYHUXFXgJPIabF1ox23RdT6_q4O2m6fq2rm3u25GN_Ag70UGjvrPAwpWBvJ7mHE_We1JrIHwB_MnvIFWp_PsCL04PquOH2tyHkwISkgcHsC"
+    ];
+
+    // Lazy load and assign premium images based on text hash to ensure visual consistency
+    function assignPremiumImages() {
+        document.querySelectorAll(".lazy-cover").forEach(img => {
+            const title = img.getAttribute("data-title") || "";
+            const genres = img.getAttribute("data-genres") || "";
+            
+            // Assign specific images depending on genre keywords for contextual beauty
+            let idx = 0;
+            if (genres.includes("Sci-Fi")) {
+                idx = 3 + (title.length % 4); // index 3, 4, 5, 6 for Sci-Fi
+            } else if (genres.includes("Documentaries")) {
+                idx = 2; // vintage cam
+            } else if (genres.includes("Dramas")) {
+                idx = 1; // wheat fields
+            } else {
+                idx = title.length % MOVIE_COVERS.length;
+            }
+            img.src = MOVIE_COVERS[idx];
+        });
+    }
+
+    // Modal view for cinema experience details
+    function openMovieDetail(title, genres, year, rating, plot) {
+        alert(`${title} (${year})\n⭐ Rating: ${rating}/10\nGenres: ${genres}\n\nPlot: ${plot}`);
+    }
+
+    // Hero watchlist add/remove toggle
+    function toggleHeroWatchlist() {
+        const title = "{{ hero_movie.title }}";
+        const btn = document.getElementById("hero-watchlist-btn");
+        const icon = document.getElementById("hero-watchlist-icon");
+        const text = document.getElementById("hero-watchlist-text");
         
-    </div>
-</body>
-</html>
+        if (CineWatchlist.has(title)) {
+            CineWatchlist.remove(title);
+            icon.textContent = "add";
+            text.textContent = "WATCHLIST";
+            btn.classList.remove("bg-on-tertiary-container");
+            btn.classList.add("bg-white/10");
+        } else {
+            CineWatchlist.add({
+                title: title,
+                genres: "{{ hero_movie.genres }}",
+                year: "{{ hero_movie.year }}",
+                type: "Movie",
+                rating: "{{ hero_movie.rating }}",
+                plot: "{{ hero_movie.plot }}"
+            });
+            icon.textContent = "check";
+            text.textContent = "SAVED";
+            btn.classList.remove("bg-white/10");
+            btn.classList.add("bg-on-tertiary-container");
+        }
+    }
+
+    // Watchlist shelf carousel item toggle
+    function toggleCarouselWatchlist(btn, title, genres, year, type, rating, plot) {
+        if (CineWatchlist.has(title)) {
+            CineWatchlist.remove(title);
+            btn.querySelector(".material-symbols-outlined").style.fontVariationSettings = "'FILL' 0";
+            btn.classList.remove("bg-on-tertiary-container");
+        } else {
+            CineWatchlist.add({ title, genres, year, type, rating, plot });
+            btn.querySelector(".material-symbols-outlined").style.fontVariationSettings = "'FILL' 1";
+            btn.classList.add("bg-on-tertiary-container");
+        }
+    }
+
+    // Search results card item toggle
+    function toggleCardWatchlist(btn, title, genres, year, type, rating, plot) {
+        const icon = btn.querySelector(".material-symbols-outlined");
+        if (CineWatchlist.has(title)) {
+            CineWatchlist.remove(title);
+            icon.textContent = "add";
+            btn.classList.remove("bg-on-tertiary-container");
+        } else {
+            CineWatchlist.add({ title, genres, year, type, rating, plot });
+            icon.textContent = "check";
+            btn.classList.add("bg-on-tertiary-container");
+        }
+    }
+
+    // Initialize watchlist buttons checked states on load
+    function initWatchlistStates() {
+        const title = "{{ hero_movie.title }}";
+        const btn = document.getElementById("hero-watchlist-btn");
+        if (btn) {
+            const icon = document.getElementById("hero-watchlist-icon");
+            const text = document.getElementById("hero-watchlist-text");
+            if (CineWatchlist.has(title)) {
+                icon.textContent = "check";
+                text.textContent = "SAVED";
+                btn.classList.remove("bg-white/10");
+                btn.classList.add("bg-on-tertiary-container");
+            }
+        }
+        
+        // Rows Carousels bookmarks
+        document.querySelectorAll(".carousel-watchlist-btn").forEach(button => {
+            // Find movie title inside closest card details
+            const card = button.closest(".group");
+            const titleElem = card.querySelector("h4");
+            if (titleElem && CineWatchlist.has(titleElem.textContent.trim())) {
+                button.querySelector(".material-symbols-outlined").style.fontVariationSettings = "'FILL' 1";
+                button.classList.add("bg-on-tertiary-container");
+            }
+        });
+
+        // Search card checkboxes
+        document.querySelectorAll(".watchlist-toggle-btn").forEach(button => {
+            const row = button.closest(".movie-row");
+            const titleElem = row.querySelector("h4");
+            if (titleElem && CineWatchlist.has(titleElem.textContent.trim())) {
+                button.querySelector(".material-symbols-outlined").textContent = "check";
+                button.classList.add("bg-on-tertiary-container");
+            }
+        });
+    }
+
+    // Hook listeners
+    document.addEventListener("DOMContentLoaded", () => {
+        assignPremiumImages();
+        initWatchlistStates();
+        
+        // subtle parallax scroll effect for hero background
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const heroImg = document.getElementById('hero-cover');
+            if (heroImg) {
+                heroImg.style.transform = `translateY(${scrolled * 0.3}px) scale(1.05)`;
+            }
+        });
+    });
+</script>
+{% endblock %}
