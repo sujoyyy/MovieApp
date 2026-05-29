@@ -1,7 +1,13 @@
 from flask import Flask, render_template, request, jsonify
 import sqlite3
+import urllib.request
+import urllib.parse
+import json
 
 app = Flask(__name__)
+
+# Server-side in-memory cache to ensure extreme load speeds and avoid rate-limiting
+POSTER_CACHE = {}
 
 def query_movies(selected_genres=None, era=None, max_runtime=240, industry='All', query_str=None, sort_by='rating', limit=30):
     conn = sqlite3.connect('movies.db')
@@ -129,6 +135,31 @@ def api_movies():
         limit=limit
     )
     return jsonify(results)
+
+# Real movie poster fetcher route with zero configuration (no API key required)
+@app.route('/api/poster', methods=['GET'])
+def get_movie_poster():
+    title = request.args.get('title')
+    if not title:
+        return jsonify({'poster': ''})
+        
+    if title in POSTER_CACHE:
+        return jsonify({'poster': POSTER_CACHE[title]})
+        
+    try:
+        url = f"https://imdb.iamidiotareyoutoo.com/search?q={urllib.parse.quote(title)}"
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'})
+        with urllib.request.urlopen(req, timeout=3) as response:
+            data = json.loads(response.read().decode('utf-8'))
+            if data.get('ok') and data.get('description'):
+                poster = data['description'][0].get('#IMG_POSTER')
+                if poster:
+                    POSTER_CACHE[title] = poster
+                    return jsonify({'poster': poster})
+    except Exception as e:
+        print(f"Error fetching poster for {title}: {e}")
+        
+    return jsonify({'poster': ''})
 
 @app.route('/', methods=['GET', 'POST'])
 def index():

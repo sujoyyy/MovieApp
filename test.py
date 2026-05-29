@@ -10,4 +10,4 @@ response = requests.get(url).json()
 if response["Response"] == "True":
     print("Poster URL:", response["Poster"])
 else:
-    print("Movie not found")
+    print("Movie not found")9

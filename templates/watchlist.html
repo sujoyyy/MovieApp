@@ -126,7 +126,7 @@
             card.onclick = () => alert("Resuming " + item.title + " playback...");
             card.innerHTML = `
                 <div class="absolute inset-0 z-0">
-                    <img class="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700" src="${getHistoryImage(item.title, i)}" alt="${item.title}"/>
+                    <img class="lazy-hist-${i} w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 3'%3E%3C/svg%3E" alt="${item.title}"/>
                 </div>
                 <div class="relative z-10 w-full">
                     <div class="flex items-center gap-2 mb-2">
@@ -144,6 +144,7 @@
                 </div>
             `;
             container.appendChild(card);
+            loadRealPoster(item.title, card.querySelector(`.lazy-hist-${i}`), getHistoryImage(item.title, i));
         });
 
         // Bento Info panel
@@ -221,7 +222,7 @@
                 const coverUrl = COVER_URLS[i % COVER_URLS.length];
                 
                 card.innerHTML = `
-                    <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="${coverUrl}" alt="${m.title}"/>
+                    <img class="lazy-watch-${i} w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 3'%3E%3C/svg%3E" alt="${m.title}"/>
                     <div class="poster-overlay absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent opacity-0 translate-y-4 transition-all duration-300 flex flex-col justify-end p-4">
                         <div class="flex justify-between items-center mb-2">
                             <span class="bg-on-tertiary-container text-white text-[9px] px-2 py-0.5 rounded font-extrabold tracking-wider shadow shadow-on-tertiary-container/30">${m.match || 90}% MATCH</span>
@@ -247,6 +248,7 @@
                 `;
                 
                 grid.appendChild(card);
+                loadRealPoster(m.title, card.querySelector(`.lazy-watch-${i}`), coverUrl);
             });
 
             // Append "+ Add more titles" bento card slot at the end

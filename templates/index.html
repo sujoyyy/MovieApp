@@ -328,23 +328,29 @@
 
     // Lazy load and assign premium images based on text hash to ensure visual consistency
     function assignPremiumImages() {
-        document.querySelectorAll(".lazy-cover").forEach(img => {
+        document.querySelectorAll(".lazy-cover").forEach((img, i) => {
             const title = img.getAttribute("data-title") || "";
             const genres = img.getAttribute("data-genres") || "";
             
-            // Assign specific images depending on genre keywords for contextual beauty
             let idx = 0;
             if (genres.includes("Sci-Fi")) {
-                idx = 3 + (title.length % 4); // index 3, 4, 5, 6 for Sci-Fi
+                idx = 3 + (title.length % 4);
             } else if (genres.includes("Documentaries")) {
-                idx = 2; // vintage cam
+                idx = 2;
             } else if (genres.includes("Dramas")) {
-                idx = 1; // wheat fields
+                idx = 1;
             } else {
                 idx = title.length % MOVIE_COVERS.length;
             }
-            img.src = MOVIE_COVERS[idx];
+            let defaultCover = MOVIE_COVERS[idx];
+            
+            loadRealPoster(title, img, defaultCover);
         });
+
+        const heroCover = document.getElementById("hero-cover");
+        if (heroCover) {
+            loadRealPoster("{{ hero_movie.title }}", heroCover, "https://lh3.googleusercontent.com/aida-public/AB6AXuBN_A_7vsgIFE4CGanYJ_rrLtdAjGmgy-2ydTNA1zfg-V3DmvHu558y5xor194hs66_d4LYiDkOewvIjzZdOWr4BGhriJ1Osq1lNO1eALzWzJloQv_cLF-AOSqqzwy9m6kBtVXuh4Pr_ijNrrnyk1QUOk0oN_NsQtilACWGDHnPQxmgbcmm4MLq-1rpiMDM2bGvjzpSAtk2TlJUApOeQF7gmMer6Khvwse2gAPmlilygvGzNEwlcP4RBALg55Er_OR6M7YG9kCHwFAk");
+        }
     }
 
     // Modal view for cinema experience details

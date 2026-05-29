@@ -279,7 +279,7 @@
                     card.onclick = () => alert(`${movie.title} (${movie.year})\n⭐ ${movie.rating}/10\nPlot: ${movie.plot}`);
                     
                     card.innerHTML = `
-                        <img class="w-full h-full object-cover" src="${cover}" alt="${movie.title}"/>
+                        <img class="w-full h-full object-cover lazy-cover-${i}" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 3'%3E%3C/svg%3E" alt="${movie.title}"/>
                         <div class="absolute top-3 right-3 bg-on-tertiary-container text-white text-[10px] font-extrabold px-2 py-0.5 rounded tracking-wider shadow">
                             ${movie.match}% MATCH
                         </div>
@@ -314,6 +314,9 @@
                     }
                     
                     shelf.appendChild(card);
+                    
+                    const img = card.querySelector(`.lazy-cover-${i}`);
+                    loadRealPoster(movie.title, img, cover);
                 });
                 
                 document.getElementById("candidates-lbl").innerText = `Refining 4,203 initial candidates down to ${movies.length} optimal matches.`;

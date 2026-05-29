@@ -318,6 +318,27 @@
         }
     };
 
+    // Fetch and load real movie poster cover dynamically
+    function loadRealPoster(title, imgElement, fallbackUrl = "") {
+        if (!title) return;
+        
+        imgElement.style.backgroundColor = "#1a1c1c";
+        
+        fetch(`/api/poster?title=${encodeURIComponent(title)}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.poster) {
+                    imgElement.src = data.poster;
+                } else if (fallbackUrl) {
+                    imgElement.src = fallbackUrl;
+                }
+            })
+            .catch(err => {
+                console.log("Error loading poster for", title, err);
+                if (fallbackUrl) imgElement.src = fallbackUrl;
+            });
+    }
+
     // Initialize badges
     document.addEventListener("DOMContentLoaded", () => {
         CineWatchlist.updateBadge();

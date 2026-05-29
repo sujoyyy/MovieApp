@@ -211,7 +211,7 @@
         c1.className = "md:col-span-2 md:row-span-2 relative rounded-xl overflow-hidden group cursor-pointer border border-white/5 shadow-2xl bento-card";
         c1.onclick = () => alert(m1.title + " Plot: " + m1.plot);
         c1.innerHTML = `
-            <img src="${getMovieImage(m1.title, 0)}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="${m1.title}"/>
+            <img class="lazy-bento-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 3'%3E%3C/svg%3E" alt="${m1.title}"/>
             <div class="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent"></div>
             <div class="absolute bottom-0 left-0 p-8 w-full">
                 <span class="bg-on-tertiary-container text-white text-[10px] px-2 py-0.5 rounded font-extrabold shadow shadow-on-tertiary-container/30 uppercase tracking-wider mb-3 inline-block">${m1.match}% MATCH</span>
@@ -224,6 +224,7 @@
             </div>
         `;
         container.appendChild(c1);
+        loadRealPoster(m1.title, c1.querySelector(".lazy-bento-0"), getMovieImage(m1.title, 0));
 
         // Card 2: Side Card 1 (colspan 2)
         if (movies.length > 1) {
@@ -232,7 +233,7 @@
             c2.className = "md:col-span-2 relative rounded-xl overflow-hidden group cursor-pointer border border-white/5 bento-card h-[280px] md:h-auto";
             c2.onclick = () => alert(m2.title + " Plot: " + m2.plot);
             c2.innerHTML = `
-                <img src="${getMovieImage(m2.title, 1)}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="${m2.title}"/>
+                <img class="lazy-bento-1 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 3'%3E%3C/svg%3E" alt="${m2.title}"/>
                 <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
                 <div class="absolute bottom-0 left-0 p-6">
                     <span class="text-[10px] text-on-tertiary-container font-extrabold tracking-wider uppercase mb-1 block">GENRE DEFINING • ${m2.match}% MATCH</span>
@@ -240,6 +241,7 @@
                 </div>
             `;
             container.appendChild(c2);
+            loadRealPoster(m2.title, c2.querySelector(".lazy-bento-1"), getMovieImage(m2.title, 1));
         }
 
         // Card 3 & 4: Small highlights
@@ -251,7 +253,7 @@
                 c.className = "relative rounded-xl overflow-hidden group cursor-pointer border border-white/5 bento-card h-[200px] md:h-auto";
                 c.onclick = () => alert(m.title);
                 c.innerHTML = `
-                    <img src="${getMovieImage(m.title, i)}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="${m.title}"/>
+                    <img class="lazy-bento-${i} w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 3'%3E%3C/svg%3E" alt="${m.title}"/>
                     <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
                     <div class="absolute bottom-0 left-0 p-4">
                         <span class="text-[9px] text-white/50 block font-bold mb-0.5">${m.genres.split(',')[0].toUpperCase()}</span>
@@ -259,6 +261,7 @@
                     </div>
                 `;
                 container.appendChild(c);
+                loadRealPoster(m.title, c.querySelector(`.lazy-bento-${i}`), getMovieImage(m.title, i));
             }
         }
     }
@@ -278,7 +281,7 @@
             card.onclick = () => alert(m.title);
             card.innerHTML = `
                 <div class="relative aspect-[2/3] rounded-xl overflow-hidden mb-4 border border-white/5 shadow">
-                    <img src="${getMovieImage(m.title, i+4)}" class="w-full h-full object-cover md:grayscale group-hover:grayscale-0 transition-all duration-500" alt="${m.title}"/>
+                    <img class="lazy-gem-${i} w-full h-full object-cover md:grayscale group-hover:grayscale-0 transition-all duration-500" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 3'%3E%3C/svg%3E" alt="${m.title}"/>
                     <div class="absolute top-3 right-3 glass-panel px-2.5 py-0.5 rounded text-[10px] font-extrabold text-on-tertiary-container shadow">${m.match}% MATCH</div>
                     <div class="absolute inset-0 bg-black/0 group-hover:bg-black/70 transition-all duration-300 flex flex-col justify-end p-6 translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100">
                         <button class="w-full py-2 bg-on-surface text-background font-extrabold rounded-lg text-xs uppercase active:scale-95 transition-all mb-2" onclick="event.stopPropagation(); alert('Dynamic play...')">WATCH NOW</button>
@@ -292,6 +295,7 @@
                 </div>
             `;
             container.appendChild(card);
+            loadRealPoster(m.title, card.querySelector(`.lazy-gem-${i}`), getMovieImage(m.title, i+4));
         });
     }
 
