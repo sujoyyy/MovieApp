@@ -1,0 +1,199 @@
+{% extends "layout.html" %}
+
+{% block title %}CineMatch | AI Chatbot Assistant{% endblock %}
+
+{% block extra_head %}
+<style>
+    .chat-container {
+        height: calc(100vh - 180px);
+    }
+    .user-bubble {
+        background-color: rgba(229, 9, 20, 0.2);
+        border: 1px solid rgba(229, 9, 20, 0.4);
+    }
+    .bot-bubble {
+        background-color: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="px-6 md:px-margin-desktop py-8 max-w-4xl mx-auto flex flex-col h-[calc(100vh-80px)]">
+    
+    <!-- Title & Header -->
+    <div class="mb-4">
+        <span class="text-on-tertiary-container font-headline-lg tracking-widest uppercase text-glow">CineMatch AI</span>
+        <h2 class="font-display-lg text-3xl text-on-surface leading-none mt-1">Chatbot Movie Assistant</h2>
+    </div>
+
+    <!-- Chat Board Frame -->
+    <div class="flex-grow flex flex-col bg-surface-container-low border border-white/5 rounded-2xl overflow-hidden shadow-2xl relative">
+        <div class="absolute inset-0 bg-gradient-to-tr from-on-tertiary-container/5 to-transparent pointer-events-none"></div>
+        
+        <!-- Chat History View -->
+        <div id="chat-history" class="flex-grow overflow-y-auto p-6 space-y-6 relative z-10 scroll-smooth">
+            
+            <!-- Welcome Bot Message -->
+            <div class="flex items-start gap-4">
+                <div class="w-8 h-8 rounded-full bg-on-tertiary-container flex items-center justify-center text-white shrink-0 shadow shadow-on-tertiary-container/30">
+                    <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+                </div>
+                <div class="bot-bubble rounded-2xl rounded-tl-none p-4 max-w-xl text-on-surface">
+                    <p class="text-sm leading-relaxed">
+                        Hello! I am your CineMatch AI Movie Assistant. I can understand natural English queries.
+                        Try asking me something like:
+                    </p>
+                    <ul class="list-disc list-inside text-xs text-on-surface-variant mt-2 space-y-1">
+                        <li>"Recommend a science fiction movie similar to Inception."</li>
+                        <li>"Suggest a mind-bending thriller under 150 minutes."</li>
+                        <li>"Give me a funny family movie from the 2000s."</li>
+                    </ul>
+                </div>
+            </div>
+            
+        </div>
+        
+        <!-- Typing Indicator -->
+        <div id="typing-indicator" class="px-6 py-2 text-xs text-on-surface-variant hidden items-center gap-2 relative z-10">
+            <span class="animate-bounce">●</span>
+            <span class="animate-bounce delay-100">●</span>
+            <span class="animate-bounce delay-200">●</span>
+            <span>CineMatch AI is looking up movies...</span>
+        </div>
+
+        <!-- Chat Input Form -->
+        <div class="p-4 bg-surface-container-high border-t border-white/5 relative z-10">
+            <form id="chat-form" onsubmit="sendMessage(event)" class="flex gap-4">
+                <input id="chat-input" type="text" class="flex-grow bg-surface border border-white/10 rounded-full px-6 py-3 text-sm text-on-surface focus:outline-none focus:border-on-tertiary-container focus:ring-1 focus:ring-on-tertiary-container transition-all" placeholder="Ask for a movie recommendation..." autocomplete="off"/>
+                <button type="submit" class="w-12 h-12 bg-on-tertiary-container text-white rounded-full flex items-center justify-center hover:bg-red-700 active:scale-95 transition-all shadow-lg hover:shadow-on-tertiary-container/30 shrink-0">
+                    <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">send</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.chatbotMovies = [];
+
+    function showChatbotMovie(idx) {
+        const m = window.chatbotMovies[idx];
+        if (m) {
+            alert(`${m.title} (${m.year})\n⭐ Rating: ${m.rating}/10\nGenres: ${m.genres}\n\nPlot: ${m.plot}`);
+        }
+    }
+
+    function appendMessage(sender, text, movies = []) {
+        const history = document.getElementById("chat-history");
+        const bubbleContainer = document.createElement("div");
+        bubbleContainer.className = "flex items-start gap-4 " + (sender === "user" ? "flex-row-reverse" : "");
+        
+        let avatar = "";
+        if (sender === "user") {
+            avatar = `
+                <div class="w-8 h-8 rounded-full border border-white/10 overflow-hidden shrink-0">
+                    <img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJy4bKNMt0OtqnJS5KqoRR5l7g7Faa0kRPXKnLjwhOpy8cGdoad9GIqZ0LoK_yujheYUXc88Zzp_y7DkG-PJHb5wIbKrd-J7GlPTzJ5GG-jf7IS4NGLuGwjWBVk75vbxB7MWN_UrFqu8kZ1TMI43vfDsD8p-yJCS1U7ZTyJbs6a5cfzuyQ6L5eB1rrXnY-FUsMH_aHiVFCiQNReuxfSWNseB5GqKes_11FMuTYbTZfy0Gldkqz_UMiumwuuikkVxTPfjDXzApte4cA" alt="User"/>
+                </div>
+            `;
+        } else {
+            avatar = `
+                <div class="w-8 h-8 rounded-full bg-on-tertiary-container flex items-center justify-center text-white shrink-0 shadow shadow-on-tertiary-container/30">
+                    <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+                </div>
+            `;
+        }
+        
+        let bubbleClass = sender === "user" ? "user-bubble rounded-2xl rounded-tr-none" : "bot-bubble rounded-2xl rounded-tl-none";
+        
+        let movieCardsHtml = "";
+        if (movies && movies.length > 0) {
+            const startIdx = window.chatbotMovies.length;
+            window.chatbotMovies.push(...movies);
+            
+            movieCardsHtml = `<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">`;
+            movies.forEach((m, idx) => {
+                const globalIdx = startIdx + idx;
+                movieCardsHtml += `
+                    <div class="bg-surface-container-high border border-white/10 rounded-xl p-3 flex gap-3 cursor-pointer hover:border-on-tertiary-container transition-all spotlight-card" onclick="showChatbotMovie(${globalIdx})">
+                        <div class="w-16 h-24 bg-surface rounded overflow-hidden shrink-0">
+                            <img id="card-img-${idx}-${Date.now()}" class="w-full h-full object-cover" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 3'%3E%3C/svg%3E" alt="${m.title}"/>
+                        </div>
+                        <div class="flex-grow flex flex-col justify-between overflow-hidden">
+                            <div>
+                                <h4 class="font-bold text-xs text-white truncate">${m.title}</h4>
+                                <p class="text-[9px] text-on-surface-variant font-semibold mt-0.5">${m.display_genre || m.genres.split(',')[0]} • ${m.year}</p>
+                            </div>
+                            <div class="flex justify-between items-center text-[10px]">
+                                <span class="text-on-tertiary-container font-bold">⭐ ${m.rating}</span>
+                                <span class="bg-on-tertiary-container/20 text-on-tertiary-container px-1 py-0.5 rounded text-[8px] font-extrabold font-mono">${m.match}% Match</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            movieCardsHtml += `</div>`;
+        }
+        
+        // Convert markdown stars/bold to HTML tags
+        let formattedText = text
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\n/g, '<br/>');
+        
+        bubbleContainer.innerHTML = `
+            ${avatar}
+            <div class="${bubbleClass} p-4 max-w-xl text-on-surface text-sm">
+                <p class="leading-relaxed">${formattedText}</p>
+                ${movieCardsHtml}
+            </div>
+        `;
+        
+        history.appendChild(bubbleContainer);
+        history.scrollTop = history.scrollHeight;
+        
+        // Lazy load movie images if present
+        if (movies && movies.length > 0) {
+            movies.forEach((m, idx) => {
+                const imgElement = bubbleContainer.querySelector(`[id^="card-img-${idx}-"]`);
+                if (imgElement) {
+                    loadRealPoster(m.title, imgElement, "https://lh3.googleusercontent.com/aida-public/AB6AXuBN_A_7vsgIFE4CGanYJ_rrLtdAjGmgy-2ydTNA1zfg-V3DmvHu558y5xor194hs66_d4LYiDkOewvIjzZdOWr4BGhriJ1Osq1lNO1eALzWzJloQv_cLF-AOSqqzwy9m6kBtVXuh4Pr_ijNrrnyk1QUOk0oN_NsQtilACWGDHnPQxmgbcmm4MLq-1rpiMDM2bGvjzpSAtk2TlJUApOeQF7gmMer6Khvwse2gAPmlilygvGzNEwlcP4RBALg55Er_OR6M7YG9kCHwFAk");
+                }
+            });
+        }
+    }
+
+    function sendMessage(event) {
+        event.preventDefault();
+        const input = document.getElementById("chat-input");
+        const msg = input.value.trim();
+        if (!msg) return;
+        
+        // Append user query
+        appendMessage("user", msg);
+        input.value = "";
+        
+        // Show typing indicator
+        const indicator = document.getElementById("typing-indicator");
+        indicator.classList.remove("hidden");
+        indicator.classList.add("flex");
+        
+        fetch('/api/chatbot', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ message: msg })
+        })
+        .then(res => res.json())
+        .then(data => {
+            indicator.classList.remove("flex");
+            indicator.classList.add("hidden");
+            
+            appendMessage("bot", data.reply, data.movies);
+        })
+        .catch(err => {
+            indicator.classList.remove("flex");
+            indicator.classList.add("hidden");
+            appendMessage("bot", "Oops! I encountered an error searching our recommendations catalog. Please try again.");
+        });
+    }
+</script>
+{% endblock %}

@@ -1,13 +1,19 @@
-import requests
+import sqlite3
 
-api_key = "YOUR_API_KEY"
-movie_name = "Interstellar"
+def print_counts():
+    conn = sqlite3.connect('movies.db')
+    cursor = conn.cursor()
+    
+    print("Language Distribution:")
+    cursor.execute("SELECT language, count(id) FROM movies GROUP BY language")
+    for r in cursor.fetchall():
+        print(f"- {r[0]}: {r[1]} movies")
+        
+    cursor.execute("SELECT count(id) FROM movies WHERE language IN ('Hindi', 'Bengali')")
+    bolly_count = cursor.fetchone()[0]
+    print(f"\nTotal Bollywood Movies: {bolly_count}")
+    
+    conn.close()
 
-url = f"https://www.omdbapi.com/?t={movie_name}&apikey={api_key}"
-
-response = requests.get(url).json()
-
-if response["Response"] == "True":
-    print("Poster URL:", response["Poster"])
-else:
-    print("Movie not found")9
+if __name__ == '__main__':
+    print_counts()

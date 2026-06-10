@@ -9,6 +9,12 @@
         backdrop-filter: blur(12px);
         border: 1px solid rgba(255, 255, 255, 0.08);
     }
+    .poster-card {
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .poster-overlay {
+        transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    }
     .poster-card:hover .poster-overlay {
         opacity: 1;
         transform: translateY(0);
@@ -37,8 +43,18 @@
         </div>
     </section>
 
+    <!-- Collections Tab Navigation -->
+    <section class="flex items-center gap-3 overflow-x-auto pb-4 border-b border-white/5 no-scrollbar">
+        <span class="text-xs font-bold text-on-surface-variant tracking-wider uppercase mr-2 shrink-0">Collections:</span>
+        <button id="tab-All" onclick="selectCollection('All')" class="tab-btn px-5 py-2 rounded-lg text-xs font-extrabold whitespace-nowrap transition-all bg-on-tertiary-container text-white shadow-md">All Saved</button>
+        <button id="tab-Weekend" onclick="selectCollection('Weekend Watchlist')" class="tab-btn px-5 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all bg-surface-container-high text-on-surface-variant hover:bg-surface-bright">Weekend Watchlist</button>
+        <button id="tab-Family" onclick="selectCollection('Family Watchlist')" class="tab-btn px-5 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all bg-surface-container-high text-on-surface-variant hover:bg-surface-bright">Family Watchlist</button>
+        <button id="tab-Action" onclick="selectCollection('Action Collection')" class="tab-btn px-5 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all bg-surface-container-high text-on-surface-variant hover:bg-surface-bright">Action Collection</button>
+        <button id="tab-Sci-Fi" onclick="selectCollection('Sci-Fi Collection')" class="tab-btn px-5 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all bg-surface-container-high text-on-surface-variant hover:bg-surface-bright">Sci-Fi Collection</button>
+    </section>
+
     <!-- Toolbar Filters -->
-    <section class="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-6 border-t border-white/5">
+    <section class="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-6">
         <div class="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 no-scrollbar">
             <span class="text-label-sm font-label-sm text-on-surface-variant whitespace-nowrap mr-2">Sort by:</span>
             <button id="sort-match" onclick="sortLibrary('match')" class="sort-btn px-4 py-1.5 bg-on-tertiary-container text-white rounded-full text-xs font-bold whitespace-nowrap transition-all shadow-md">Highest Match</button>
@@ -46,7 +62,7 @@
             <button id="sort-year" onclick="sortLibrary('year')" class="sort-btn px-4 py-1.5 bg-surface-container-high text-on-surface-variant hover:bg-surface-bright rounded-full text-xs font-semibold whitespace-nowrap transition-all">Release Year</button>
         </div>
         <div class="flex items-center gap-4">
-            <button onclick="alert('Watchlist search filters: coming soon in CineMatch Premium Pro...')" class="flex items-center gap-2 px-3 py-1.5 text-on-surface-variant hover:text-white transition-colors">
+            <button onclick="alert('Collections filter sorting: active.')" class="flex items-center gap-2 px-3 py-1.5 text-on-surface-variant hover:text-white transition-colors">
                 <span class="material-symbols-outlined text-lg">filter_list</span>
                 <span class="text-xs font-semibold">Filters</span>
             </button>
@@ -108,11 +124,36 @@
     ];
 
     let currentSort = "match";
+    let activeCollection = "All";
+    let collectionsData = {};
 
     function getHistoryImage(title, i) {
         if (title.includes("Neon")) return "https://lh3.googleusercontent.com/aida-public/AB6AXuBVUFYig3lxIr-6fK-IZuDn4NaOF1i_k4cbtyIS-040F2mFNss563xI0CiUEIbTmdQ_p92403-UMpdqIS1xlu6k4UbIiXjNTkLCkzUjOZknJ3LMMebST_EIpKLz2mF3u74LqN8G7AaVf3crgAkn7TijWg6Zchvf-aQ_PgFrsIoX9jD2w2Z3VuL-h3nzbQKhSiB2LLC7rDr_nBFyMWqr6mEV-Lca-s09n9Xe4TiBbSAADG9AUOiZ4nilgzOLnw_YTnOaIS5W4C0JJ80n";
         if (title.includes("Reel")) return "https://lh3.googleusercontent.com/aida-public/AB6AXuBv703QE8P7S9oOUFJbhKTgASaWKOMSkZxvwzAe1x7ZMfh70zgbYh-kfuAWlzC_mTJ2Mzn0s6Rq9tBhOnTRyenfD3pTb27QivvEnxXEk16P-4gaAINehLDi5KSKY4pFLszJ1yRizjdAFP_NeHQe17llom0ve8mHpZp_F_AjELphJYqOWXrydG8rWdIKdHOOcxfzw0fl7f3VvPdsGc8tPunbE2foyoGUz23DT0A_5MLY9rq97Tspd8f1GFuWoo0S8peQh33TaLZe2XtM";
         return COVER_URLS[i % COVER_URLS.length];
+    }
+
+    function selectCollection(collectionName) {
+        activeCollection = collectionName;
+        
+        // Reset tab styles
+        document.querySelectorAll(".tab-btn").forEach(btn => {
+            btn.className = "tab-btn px-5 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all bg-surface-container-high text-on-surface-variant hover:bg-surface-bright";
+        });
+        
+        // Find matching active button
+        let tabId = "tab-All";
+        if (collectionName.includes("Weekend")) tabId = "tab-Weekend";
+        else if (collectionName.includes("Family")) tabId = "tab-Family";
+        else if (collectionName.includes("Action")) tabId = "tab-Action";
+        else if (collectionName.includes("Sci-Fi")) tabId = "tab-Sci-Fi";
+        
+        const activeBtn = document.getElementById(tabId);
+        if (activeBtn) {
+            activeBtn.className = "tab-btn px-5 py-2 rounded-lg text-xs font-extrabold whitespace-nowrap transition-all bg-on-tertiary-container text-white shadow-md";
+        }
+        
+        renderWatchlist();
     }
 
     function renderHistory() {
@@ -156,17 +197,41 @@
             </div>
             <h4 class="font-headline-lg text-headline-lg text-white mb-2 leading-none">Curated Sort Active</h4>
             <p class="text-white/70 text-xs font-semibold mb-6 max-w-[200px] leading-relaxed">Watchlist titles automatically aligned with your historical interests.</p>
-            <button onclick="CineWatchlist.dispatchEvent()" class="px-6 py-2 bg-white text-black font-extrabold rounded-full text-xs hover:bg-neutral-200 transition-all uppercase tracking-wider active:scale-95">
+            <button onclick="loadCollections()" class="px-6 py-2 bg-white text-black font-extrabold rounded-full text-xs hover:bg-neutral-200 transition-all uppercase tracking-wider active:scale-95">
                 Refresh Grid
             </button>
         `;
         container.appendChild(panel);
     }
 
-    function removeWatchlistItem(title) {
+    function removeWatchlistItem(event, button) {
         event.stopPropagation();
-        CineWatchlist.remove(title);
-        renderWatchlist();
+        const card = button.closest(".poster-card");
+        const title = decodeURIComponent(card.getAttribute("data-title"));
+        if (activeCollection === "All") {
+            CineWatchlist.remove(title);
+            // Also call remove from all server-side lists
+            Object.keys(collectionsData).forEach(wlName => {
+                fetch('/api/watchlists/remove', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ watchlist_name: wlName, title: title })
+                });
+            });
+            setTimeout(loadCollections, 300);
+        } else {
+            fetch('/api/watchlists/remove', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ watchlist_name: activeCollection, title: title })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    loadCollections();
+                }
+            });
+        }
     }
 
     function sortLibrary(sortType) {
@@ -185,19 +250,45 @@
         renderWatchlist();
     }
 
+    function loadCollections() {
+        fetch('/api/watchlists')
+            .then(res => res.json())
+            .then(data => {
+                collectionsData = data;
+                renderWatchlist();
+            });
+    }
+
     function renderWatchlist() {
         const grid = document.getElementById("watchlist-grid");
         grid.style.opacity = "0.5";
         
         setTimeout(() => {
-            let list = CineWatchlist.get();
+            let list = [];
+            
+            if (activeCollection === "All") {
+                list = CineWatchlist.get();
+                // Merge items from server side categories as well to ensure total visual convergence
+                Object.keys(collectionsData).forEach(wlName => {
+                    const serverList = collectionsData[wlName].movies;
+                    serverList.forEach(sm => {
+                        if (!list.some(lm => lm.title === sm.title)) {
+                            list.push(sm);
+                        }
+                    });
+                });
+            } else {
+                if (collectionsData[activeCollection]) {
+                    list = collectionsData[activeCollection].movies;
+                }
+            }
+            
             grid.innerHTML = "";
             
             if (list.length === 0) {
-                // empty state
                 grid.innerHTML = `
                     <div class="col-span-full py-16 text-center text-on-surface-variant font-medium">
-                        No titles saved in your local dashboard workspace.
+                        No titles saved in this collection collection dashboard workspace.
                         <a href="/" class="text-on-tertiary-container font-extrabold hover:underline block mt-4 tracking-wider uppercase text-sm">Discover Content Now</a>
                     </div>
                 `;
@@ -216,14 +307,15 @@
 
             list.forEach((m, i) => {
                 const card = document.createElement("div");
-                card.className = "poster-card relative group cursor-pointer aspect-[2/3] rounded-xl overflow-hidden bg-surface-container border border-white/5 hover:border-on-tertiary-container/30 hover:shadow-2xl transition-all duration-300";
-                card.onclick = () => alert(m.title);
+                card.className = "poster-card relative group cursor-pointer aspect-[2/3] rounded-xl overflow-hidden bg-surface-container border border-white/5 hover:border-on-tertiary-container/30 hover:shadow-2xl";
+                card.setAttribute("data-title", encodeURIComponent(m.title));
+                card.onclick = () => alert(`${m.title} (${m.year})\n⭐ Rating: ${m.rating}\n\nPlot: ${m.plot}`);
                 
                 const coverUrl = COVER_URLS[i % COVER_URLS.length];
                 
                 card.innerHTML = `
                     <img class="lazy-watch-${i} w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 3'%3E%3C/svg%3E" alt="${m.title}"/>
-                    <div class="poster-overlay absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent opacity-0 translate-y-4 transition-all duration-300 flex flex-col justify-end p-4">
+                    <div class="poster-overlay absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent opacity-0 translate-y-4 flex flex-col justify-end p-4">
                         <div class="flex justify-between items-center mb-2">
                             <span class="bg-on-tertiary-container text-white text-[9px] px-2 py-0.5 rounded font-extrabold tracking-wider shadow shadow-on-tertiary-container/30">${m.match || 90}% MATCH</span>
                             <span class="text-white text-[9px] font-bold">${m.year}</span>
@@ -233,18 +325,11 @@
                         
                         <div class="flex gap-2">
                             <button onclick="event.stopPropagation(); alert('Launching player...')" class="flex-grow py-2 bg-white text-black font-extrabold rounded-lg text-[10px] uppercase active:scale-95 transition-all">Watch Now</button>
-                            <button onclick="removeWatchlistItem('${m.title}')" class="p-2 glass-panel rounded-lg text-white hover:bg-on-tertiary-container hover:text-white transition-all flex items-center justify-center" title="Remove from Watchlist">
+                            <button onclick="removeWatchlistItem(event, this)" class="p-2 glass-panel rounded-lg text-white hover:bg-on-tertiary-container hover:text-white transition-all flex items-center justify-center" title="Remove from Watchlist">
                                 <span class="material-symbols-outlined text-xs">remove</span>
                             </button>
                         </div>
                     </div>
-                    
-                    <!-- NEW indicator badge for top matches -->
-                    ${i === 0 ? `
-                        <div class="absolute top-3 right-3 z-10">
-                            <span class="bg-emerald-500/95 backdrop-blur text-white text-[9px] px-2 py-0.5 rounded-full font-extrabold shadow shadow-emerald-500/30 uppercase tracking-wider">NEW</span>
-                        </div>
-                    ` : ""}
                 `;
                 
                 grid.appendChild(card);
@@ -278,16 +363,18 @@
         desc.innerText = "Analyzing library records against global Netlix index catalog... Performing structural logic queries...";
         
         setTimeout(() => {
-            const list = CineWatchlist.get();
+            let list = CineWatchlist.get();
+            Object.keys(collectionsData).forEach(wlName => {
+                list = list.concat(collectionsData[wlName].movies);
+            });
+            
             let finalScore = 75;
             let theme = "Classic Cinema & Romantic comedies";
             
             if (list.length > 0) {
-                // Dynamic analysis simulation
                 finalScore = 75 + Math.min(list.length * 4, 23);
-                
                 let matches = list.filter(m => m.genres && (m.genres.includes("Sci-Fi") || m.genres.includes("Thriller")));
-                if (matches.length > list.length / 2) {
+                if (matches.length > list.length / 3) {
                     theme = "Atmospheric Sci-Fi & Psychological thrillers";
                 } else {
                     theme = "Diverse global Dramas & cinematic narratives";
@@ -303,12 +390,7 @@
 
     document.addEventListener("DOMContentLoaded", () => {
         renderHistory();
-        renderWatchlist();
-        
-        // Listen to global changes
-        window.addEventListener("cinematch_watchlist_changed", () => {
-            renderWatchlist();
-        });
+        loadCollections();
     });
 </script>
 {% endblock %}

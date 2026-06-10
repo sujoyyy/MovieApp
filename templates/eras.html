@@ -64,14 +64,14 @@
                 <input class="era-slider relative w-full h-1 bg-transparent appearance-none cursor-pointer z-10" id="eraSlider" max="2020" min="1950" step="10" type="range" value="1990"/>
                 
                 <div class="flex justify-between mt-6 px-2 text-label-sm font-semibold text-on-surface-variant">
-                    <span class="hover:text-on-surface cursor-pointer select-none" onclick="setSliderVal(1950)">1950s</span>
-                    <span class="hover:text-on-surface cursor-pointer select-none" onclick="setSliderVal(1960)">60s</span>
-                    <span class="hover:text-on-surface cursor-pointer select-none" onclick="setSliderVal(1970)">70s</span>
-                    <span class="hover:text-on-surface cursor-pointer select-none" onclick="setSliderVal(1980)">80s</span>
-                    <span class="text-on-surface border-b-2 border-on-tertiary-container hover:text-on-surface cursor-pointer select-none font-bold" id="marker-90" onclick="setSliderVal(1990)">90s</span>
-                    <span class="hover:text-on-surface cursor-pointer select-none" onclick="setSliderVal(2000)">00s</span>
-                    <span class="hover:text-on-surface cursor-pointer select-none" onclick="setSliderVal(2010)">10s</span>
-                    <span class="hover:text-on-surface cursor-pointer select-none" onclick="setSliderVal(2020)">Present</span>
+                    <span id="marker-1950" class="era-marker hover:text-on-surface cursor-pointer select-none" onclick="setSliderVal(1950)">1950s</span>
+                    <span id="marker-1960" class="era-marker hover:text-on-surface cursor-pointer select-none" onclick="setSliderVal(1960)">60s</span>
+                    <span id="marker-1970" class="era-marker hover:text-on-surface cursor-pointer select-none" onclick="setSliderVal(1970)">70s</span>
+                    <span id="marker-1980" class="era-marker hover:text-on-surface cursor-pointer select-none" onclick="setSliderVal(1980)">80s</span>
+                    <span id="marker-1990" class="era-marker hover:text-on-surface cursor-pointer select-none" onclick="setSliderVal(1990)">90s</span>
+                    <span id="marker-2000" class="era-marker hover:text-on-surface cursor-pointer select-none" onclick="setSliderVal(2000)">00s</span>
+                    <span id="marker-2010" class="era-marker hover:text-on-surface cursor-pointer select-none" onclick="setSliderVal(2010)">10s</span>
+                    <span id="marker-2020" class="era-marker hover:text-on-surface cursor-pointer select-none" onclick="setSliderVal(2020)">Present</span>
                 </div>
             </div>
         </div>
@@ -96,7 +96,12 @@
             </div>
             
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-gutter" id="movies-grid">
-                <!-- Populated via Asynchronous query -->
+                <div class="aspect-[2/3] rounded-xl skeleton-pulse opacity-20"></div>
+                <div class="aspect-[2/3] rounded-xl skeleton-pulse opacity-20"></div>
+                <div class="aspect-[2/3] rounded-xl skeleton-pulse opacity-20"></div>
+                <div class="aspect-[2/3] rounded-xl skeleton-pulse opacity-20"></div>
+                <div class="aspect-[2/3] rounded-xl skeleton-pulse opacity-20"></div>
+                <div class="aspect-[2/3] rounded-xl skeleton-pulse opacity-20"></div>
             </div>
         </div>
     </section>
@@ -140,23 +145,23 @@
         return FALLBACK_COVERS[i % FALLBACK_COVERS.length];
     }
 
-    function toggleWatchlist(title, genres, year, rating, plot) {
-        event.stopPropagation();
-        if (CineWatchlist.has(title)) {
-            CineWatchlist.remove(title);
-            alert("Removed from saved titles.");
-        } else {
-            CineWatchlist.add({ title, genres, year, type: "Movie", rating, plot });
-            alert("Saved successfully!");
-        }
-    }
-
     function loadDecade(year) {
         let label = "";
         if (year == 2020) label = "Present";
         else label = `The ${year.toString().slice(2)}s`;
         
         document.getElementById('current-era-label').textContent = label;
+
+        // Update active marker styles dynamically
+        document.querySelectorAll(".era-marker").forEach(marker => {
+            marker.classList.remove("text-on-surface", "border-b-2", "border-on-tertiary-container", "font-bold");
+            marker.classList.add("text-on-surface-variant");
+        });
+        const activeMarker = document.getElementById("marker-" + year);
+        if (activeMarker) {
+            activeMarker.classList.remove("text-on-surface-variant");
+            activeMarker.classList.add("text-on-surface", "border-b-2", "border-on-tertiary-container", "font-bold");
+        }
 
         // Apply visual warp effect to container
         const main = document.querySelector('main');
@@ -193,6 +198,7 @@
             
             const card = document.createElement("div");
             card.className = "movie-card-hover group relative aspect-[2/3] rounded-xl overflow-hidden bg-surface-container cursor-pointer shadow-2xl";
+            card.setAttribute("data-movie", encodeURIComponent(JSON.stringify(movie)));
             card.onclick = () => alert(`${movie.title} (${movie.year})\n⭐ ${movie.rating}/10\nPlot: ${movie.plot}`);
             
             card.innerHTML = `
@@ -215,7 +221,7 @@
                             <span>${movie.type}</span>
                         </div>
                         <div class="mt-3 pt-3 border-t border-white/10 flex justify-between items-center">
-                            <button onclick="toggleWatchlist(this.closest('.movie-card-hover'), '${movie.title}', '${movie.genres}', '${movie.year}', '${movie.type}', '${movie.rating}', '${movie.plot}')" class="watchlist-toggle-btn px-3 py-1 bg-white text-black text-[10px] font-bold rounded flex items-center gap-1 active:scale-95 transition-all">
+                            <button onclick="toggleWatchlist(event, this)" class="watchlist-toggle-btn px-3 py-1 bg-white text-black text-[10px] font-bold rounded flex items-center gap-1 active:scale-95 transition-all">
                                 <span class="material-symbols-outlined text-[11px]">bookmark</span>
                                 Watchlist
                             </button>
@@ -237,15 +243,17 @@
         });
     }
 
-    function toggleWatchlist(card, title, genres, year, type, rating, plot) {
+    function toggleWatchlist(event, button) {
         event.stopPropagation();
+        const card = button.closest(".movie-card-hover");
+        const movie = JSON.parse(decodeURIComponent(card.getAttribute("data-movie")));
         const badge = card.querySelector(".badge");
-        if (CineWatchlist.has(title)) {
-            CineWatchlist.remove(title);
+        if (CineWatchlist.has(movie.title)) {
+            CineWatchlist.remove(movie.title);
             if (badge) badge.style.display = "none";
             card.classList.remove("border", "border-on-tertiary-container");
         } else {
-            CineWatchlist.add({ title, genres, year, type, rating, plot });
+            CineWatchlist.add(movie);
             if (badge) badge.style.display = "flex";
             card.classList.add("border", "border-on-tertiary-container");
         }

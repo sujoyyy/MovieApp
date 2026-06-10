@@ -8,13 +8,13 @@
         background: linear-gradient(to top, rgba(18, 20, 20, 0.95) 0%, rgba(18, 20, 20, 0) 60%);
     }
     .genre-card {
-        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.3s ease, box-shadow 0.3s ease;
     }
     .genre-card:hover {
         transform: translateY(-4px) scale(1.02);
     }
     .movie-card-hover {
-        transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+        transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.3s cubic-bezier(0.23, 1, 0.32, 1);
     }
     .movie-card-hover:hover {
         transform: translateY(-8px) scale(1.04);
@@ -167,7 +167,12 @@
 
         <!-- Shelf Container -->
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-gutter" id="movies-shelf">
-            <!-- Populated via Asynchronous query -->
+            <div class="aspect-[2/3] rounded-xl skeleton-pulse opacity-20"></div>
+            <div class="aspect-[2/3] rounded-xl skeleton-pulse opacity-20"></div>
+            <div class="aspect-[2/3] rounded-xl skeleton-pulse opacity-20"></div>
+            <div class="aspect-[2/3] rounded-xl skeleton-pulse opacity-20"></div>
+            <div class="aspect-[2/3] rounded-xl skeleton-pulse opacity-20"></div>
+            <div class="aspect-[2/3] rounded-xl skeleton-pulse opacity-20"></div>
         </div>
     </section>
 </div>
@@ -230,19 +235,37 @@
         applyFilters();
     }
 
-    function toggleWatchlist(btn, title, genres, year, type, rating, plot) {
+    function toggleWatchlist(event, button) {
         event.stopPropagation();
-        const badge = btn.querySelector(".badge");
-        if (CineWatchlist.has(title)) {
-            CineWatchlist.remove(title);
-            badge.style.display = "none";
-            btn.classList.remove("border-on-tertiary-container");
+        const card = button.closest(".movie-card-hover");
+        const movie = JSON.parse(decodeURIComponent(card.getAttribute("data-movie")));
+        const badge = card.querySelector(".badge");
+        if (CineWatchlist.has(movie.title)) {
+            CineWatchlist.remove(movie.title);
+            if (badge) badge.style.display = "none";
+            card.classList.remove("border", "border-on-tertiary-container");
         } else {
-            CineWatchlist.add({ title, genres, year, type, rating, plot });
-            badge.style.display = "block";
-            btn.classList.add("border-on-tertiary-container");
+            CineWatchlist.add(movie);
+            if (badge) badge.style.display = "flex";
+            card.classList.add("border", "border-on-tertiary-container");
         }
     }
+
+    // Setup a dynamic IntersectionObserver for lazy loading posters in genres explorer
+    const genresObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const img = entry.target;
+                const title = img.getAttribute("data-title");
+                const fallback = img.getAttribute("data-fallback");
+                loadRealPoster(title, img, fallback);
+                observer.unobserve(img);
+            }
+        });
+    }, {
+        rootMargin: "100px 0px", // Preload slightly before they scroll into view
+        threshold: 0.01
+    });
 
     // Fetch movies from API and render on shelf
     function applyFilters() {
@@ -261,10 +284,11 @@
                     
                     const card = document.createElement("div");
                     card.className = "movie-card-hover group relative aspect-[2/3] rounded-xl overflow-hidden bg-surface-container cursor-pointer shadow-2xl";
+                    card.setAttribute("data-movie", encodeURIComponent(JSON.stringify(movie)));
                     card.onclick = () => alert(`${movie.title} (${movie.year})\n⭐ ${movie.rating}/10\nPlot: ${movie.plot}`);
                     
                     card.innerHTML = `
-                        <img class="w-full h-full object-cover lazy-cover-${i}" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 3'%3E%3C/svg%3E" alt="${movie.title}"/>
+                        <img class="w-full h-full object-cover lazy-genre-cover" data-title="${movie.title}" data-fallback="${cover}" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 3'%3E%3C/svg%3E" alt="${movie.title}"/>
                         <div class="absolute top-3 right-3 bg-on-tertiary-container text-white text-[10px] font-extrabold px-2 py-0.5 rounded tracking-wider shadow">
                             ${movie.match}% MATCH
                         </div>
@@ -283,7 +307,7 @@
                                     <span>${movie.type}</span>
                                 </div>
                                 <div class="mt-3 pt-3 border-t border-white/10 flex justify-between items-center">
-                                    <button onclick="toggleWatchlist(this.closest('.movie-card-hover'), '${movie.title}', '${movie.genres}', '${movie.year}', '${movie.type}', '${movie.rating}', '${movie.plot}')" class="watchlist-toggle-btn px-3 py-1 bg-white text-black text-[10px] font-bold rounded flex items-center gap-1 active:scale-95 transition-all">
+                                    <button onclick="toggleWatchlist(event, this)" class="watchlist-toggle-btn px-3 py-1 bg-white text-black text-[10px] font-bold rounded flex items-center gap-1 active:scale-95 transition-all">
                                         <span class="material-symbols-outlined text-[11px]">bookmark</span>
                                         Watchlist
                                     </button>
@@ -300,8 +324,8 @@
                     
                     shelf.appendChild(card);
                     
-                    const img = card.querySelector(`.lazy-cover-${i}`);
-                    loadRealPoster(movie.title, img, cover);
+                    const img = card.querySelector(`.lazy-genre-cover`);
+                    genresObserver.observe(img);
                 });
                 
                 shelf.style.opacity = "1";
