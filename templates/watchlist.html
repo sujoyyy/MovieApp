@@ -207,7 +207,8 @@
     function removeWatchlistItem(event, button) {
         event.stopPropagation();
         const card = button.closest(".poster-card");
-        const title = decodeURIComponent(card.getAttribute("data-title"));
+        const movie = JSON.parse(decodeURIComponent(card.getAttribute("data-movie")));
+        const title = movie.title;
         if (activeCollection === "All") {
             CineWatchlist.remove(title);
             // Also call remove from all server-side lists
@@ -308,8 +309,8 @@
             list.forEach((m, i) => {
                 const card = document.createElement("div");
                 card.className = "poster-card relative group cursor-pointer aspect-[2/3] rounded-xl overflow-hidden bg-surface-container border border-white/5 hover:border-on-tertiary-container/30 hover:shadow-2xl";
-                card.setAttribute("data-title", encodeURIComponent(m.title));
-                card.onclick = () => alert(`${m.title} (${m.year})\n⭐ Rating: ${m.rating}\n\nPlot: ${m.plot}`);
+                card.setAttribute("data-movie", encodeURIComponent(JSON.stringify(m)));
+                card.onclick = () => openMovieDetailFromElement(card);
                 
                 const coverUrl = COVER_URLS[i % COVER_URLS.length];
                 
@@ -391,6 +392,11 @@
     document.addEventListener("DOMContentLoaded", () => {
         renderHistory();
         loadCollections();
+        
+        // Listen to changes in watchlist (e.g. from modal) and reload collection grid in real-time
+        window.addEventListener("cinematch_watchlist_changed", () => {
+            loadCollections();
+        });
     });
 </script>
 {% endblock %}

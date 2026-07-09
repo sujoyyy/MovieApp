@@ -199,7 +199,7 @@
             const card = document.createElement("div");
             card.className = "movie-card-hover group relative aspect-[2/3] rounded-xl overflow-hidden bg-surface-container cursor-pointer shadow-2xl";
             card.setAttribute("data-movie", encodeURIComponent(JSON.stringify(movie)));
-            card.onclick = () => alert(`${movie.title} (${movie.year})\n⭐ ${movie.rating}/10\nPlot: ${movie.plot}`);
+            card.onclick = () => openMovieDetailFromElement(card);
             
             card.innerHTML = `
                 <img class="w-full h-full object-cover lazy-cover-${i}" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 3'%3E%3C/svg%3E" alt="${movie.title}"/>
@@ -259,6 +259,20 @@
         }
     }
 
+    function initWatchlistStates() {
+        document.querySelectorAll(".movie-card-hover[data-movie]").forEach(card => {
+            const movie = JSON.parse(decodeURIComponent(card.getAttribute("data-movie")));
+            const isSaved = CineWatchlist.has(movie.title);
+            const badge = card.querySelector(".badge");
+            if (badge) badge.style.display = isSaved ? 'flex' : 'none';
+            if (isSaved) {
+                card.classList.add("border", "border-on-tertiary-container");
+            } else {
+                card.classList.remove("border", "border-on-tertiary-container");
+            }
+        });
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
         const eraSlider = document.getElementById('eraSlider');
         
@@ -269,6 +283,8 @@
         
         // Initial load
         loadDecade(1990);
+        
+        window.addEventListener("cinematch_watchlist_changed", initWatchlistStates);
     });
 </script>
 {% endblock %}

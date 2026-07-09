@@ -32,7 +32,7 @@ POSTER_CACHE = {}
 
 def init_poster_cache_db():
     try:
-        conn = sqlite3.connect('movies.db')
+        conn = sqlite3.connect('movies.db', timeout=10)
         cursor = conn.cursor()
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS poster_cache (
@@ -45,12 +45,24 @@ def init_poster_cache_db():
     except Exception as e:
         print(f"Error creating poster_cache table: {e}")
 
+def load_poster_cache_into_memory():
+    try:
+        conn = sqlite3.connect('movies.db', timeout=10)
+        cursor = conn.cursor()
+        cursor.execute("SELECT title, poster FROM poster_cache")
+        for row in cursor.fetchall():
+            POSTER_CACHE[row[0]] = row[1]
+        conn.close()
+        print(f"Pre-warmed memory cache with {len(POSTER_CACHE)} poster URLs.")
+    except Exception as e:
+        print(f"Error pre-warming memory cache: {e}")
+
 def create_indexes():
     """
     Verify and create critical indexes in movies.db to optimize query speeds (reducing table scan times from ~300ms to <1ms).
     """
     try:
-        conn = sqlite3.connect('movies.db')
+        conn = sqlite3.connect('movies.db', timeout=10)
         cursor = conn.cursor()
         
         # Create indexes for movies table
@@ -79,7 +91,7 @@ def prefetch_posters():
         # Wait a few seconds for the Flask server to start up completely
         time.sleep(3)
         
-        conn = sqlite3.connect('movies.db')
+        conn = sqlite3.connect('movies.db', timeout=10)
         cursor = conn.cursor()
         
         # Fetch titles likely to be displayed on index and dashboard shelves
@@ -122,7 +134,7 @@ def prefetch_posters():
                         poster = data['description'][0].get('#IMG_POSTER')
                         if poster:
                             # Save to sqlite cache
-                            conn2 = sqlite3.connect('movies.db')
+                            conn2 = sqlite3.connect('movies.db', timeout=10)
                             cursor2 = conn2.cursor()
                             cursor2.execute("INSERT OR REPLACE INTO poster_cache (title, poster) VALUES (?, ?)", (title, poster))
                             conn2.commit()
@@ -143,6 +155,7 @@ def start_prefetch_thread():
     threading.Thread(target=prefetch_posters, daemon=True).start()
 
 init_poster_cache_db()
+load_poster_cache_into_memory()
 create_indexes()
 start_prefetch_thread()
 
@@ -269,7 +282,7 @@ def parse_natural_language_query(query_str):
     return extracted
 
 def query_movies(selected_genres=None, era=None, max_runtime=240, industry='All', query_str=None, sort_by='rating', limit=30, language='All', mood=None, user_id=1):
-    conn = sqlite3.connect('movies.db')
+    conn = sqlite3.connect('movies.db', timeout=10)
     cursor = conn.cursor()
     
     # 1. Collaborative Filtering calculations (User-Based Collaborative Filtering)
@@ -302,13 +315,13 @@ def query_movies(selected_genres=None, era=None, max_runtime=240, industry='All'
             user_similarities[uid] = intersection / union if union > 0 else 0
             
         # Aggregate movie suggestions weighted by similarity
-        for uid, similarity in user_similarities.items():
-            if similarity == 0:
-                continue
-            cursor.execute("SELECT movie_title FROM user_likes WHERE user_id = ? AND liked = 1", (uid,))
-            other_liked_movies = [row[0] for row in cursor.fetchall()]
-            for m_title in other_liked_movies:
+        uids = [uid for uid, sim in user_similarities.items() if sim > 0]
+        if uids:
+            placeholders = ','.join('?' for _ in uids)
+            cursor.execute(f"SELECT user_id, movie_title FROM user_likes WHERE user_id IN ({placeholders}) AND liked = 1", uids)
+            for uid, m_title in cursor.fetchall():
                 if m_title not in user_liked:
+                    similarity = user_similarities[uid]
                     collab_scores[m_title] = collab_scores.get(m_title, 0) + similarity
                     
         # Normalize collab scores to 0-100 scale
@@ -543,7 +556,7 @@ def get_movie_poster():
         
     # Check persistent SQLite cache
     try:
-        conn = sqlite3.connect('movies.db')
+        conn = sqlite3.connect('movies.db', timeout=10)
         cursor = conn.cursor()
         cursor.execute("SELECT poster FROM poster_cache WHERE title = ?", (title,))
         row = cursor.fetchone()
@@ -566,7 +579,7 @@ def get_movie_poster():
                     POSTER_CACHE[title] = poster
                     # Save to persistent SQLite cache
                     try:
-                        conn = sqlite3.connect('movies.db')
+                        conn = sqlite3.connect('movies.db', timeout=10)
                         cursor = conn.cursor()
                         cursor.execute("INSERT OR REPLACE INTO poster_cache (title, poster) VALUES (?, ?)", (title, poster))
                         conn.commit()
@@ -620,7 +633,7 @@ def api_like_movie():
     if not title:
         return jsonify({'error': 'Title is required'}), 400
         
-    conn = sqlite3.connect('movies.db')
+    conn = sqlite3.connect('movies.db', timeout=10)
     cursor = conn.cursor()
     
     # Check if interaction exists
@@ -646,7 +659,7 @@ def api_like_movie():
 # Reviews API
 @app.route('/api/reviews', methods=['GET', 'POST'])
 def api_reviews():
-    conn = sqlite3.connect('movies.db')
+    conn = sqlite3.connect('movies.db', timeout=10)
     cursor = conn.cursor()
     
     if request.method == 'POST':
@@ -735,7 +748,7 @@ def api_reviews_helpful():
     if not review_id:
         return jsonify({'error': 'Review ID missing'}), 400
         
-    conn = sqlite3.connect('movies.db')
+    conn = sqlite3.connect('movies.db', timeout=10)
     cursor = conn.cursor()
     cursor.execute("UPDATE reviews SET helpful_votes = helpful_votes + 1 WHERE id = ?", (review_id,))
     conn.commit()
@@ -746,7 +759,7 @@ def api_reviews_helpful():
 @app.route('/api/watchlists', methods=['GET'])
 def api_watchlists():
     user_id = request.args.get('user_id', 1, type=int)
-    conn = sqlite3.connect('movies.db')
+    conn = sqlite3.connect('movies.db', timeout=10)
     cursor = conn.cursor()
     
     # Get all watchlist lists
@@ -796,7 +809,7 @@ def api_watchlist_add():
     if not wl_name or not title:
         return jsonify({'error': 'Missing parameters'}), 400
         
-    conn = sqlite3.connect('movies.db')
+    conn = sqlite3.connect('movies.db', timeout=10)
     cursor = conn.cursor()
     
     # Get or create watchlist
@@ -831,7 +844,7 @@ def api_watchlist_remove():
     if not wl_name or not title:
         return jsonify({'error': 'Missing parameters'}), 400
         
-    conn = sqlite3.connect('movies.db')
+    conn = sqlite3.connect('movies.db', timeout=10)
     cursor = conn.cursor()
     
     cursor.execute("SELECT id FROM watchlists WHERE user_id = ? AND watchlist_name = ?", (user_id, wl_name))
@@ -1064,7 +1077,7 @@ def api_dashboard():
     trending = query_movies(era='Modern', sort_by='rating', limit=8, user_id=user_id)
     
     # 4. Most Watched: query movies based on interactions table
-    conn = sqlite3.connect('movies.db')
+    conn = sqlite3.connect('movies.db', timeout=10)
     cursor = conn.cursor()
     cursor.execute("""
         SELECT movie_title, COUNT(id) as count 
@@ -1111,10 +1124,6 @@ def index():
         'explanation': {'genre_match': ['Sci-Fi'], 'runtime_match': True, 'era_match': True, 'collab_match': False, 'score': 98}
     }
 
-    rec_movies = query_movies(sort_by='rating', limit=8)
-    scifi_movies = query_movies(selected_genres=['Sci-Fi'], limit=8)
-    classic_movies = query_movies(era='90s', limit=8)
-
     if request.method == 'POST':
         search_q = request.form.get('search_q')
         
@@ -1149,6 +1158,38 @@ def index():
                 mood=mood if mood != '' else None
             )
             search_triggered = True
+
+    trending = None
+    most_watched = None
+    top_rated = None
+    new_releases = None
+
+    if results is None:
+        # Load dashboard suggestion shelves on default load
+        trending = query_movies(era='Modern', sort_by='rating', limit=8)
+        top_rated = query_movies(sort_by='rating', limit=8)
+        new_releases = query_movies(sort_by='release_year', limit=8)
+        
+        # Most Watched
+        conn = sqlite3.connect('movies.db', timeout=10)
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT movie_title, COUNT(id) as count 
+            FROM interactions 
+            GROUP BY movie_title 
+            ORDER BY count DESC 
+            LIMIT 8
+        """)
+        most_watched_rows = cursor.fetchall()
+        conn.close()
+        
+        most_watched = []
+        for title, count in most_watched_rows:
+            res = query_movies(query_str=title, limit=1)
+            if res:
+                most_watched.append(res[0])
+        if not most_watched:
+            most_watched = query_movies(limit=8)
             
     return render_template(
         'index.html', 
@@ -1156,9 +1197,10 @@ def index():
         results=results, 
         search_triggered=search_triggered,
         hero_movie=hero_movie,
-        rec_movies=rec_movies,
-        scifi_movies=scifi_movies,
-        classic_movies=classic_movies
+        trending=trending,
+        most_watched=most_watched,
+        top_rated=top_rated,
+        new_releases=new_releases
     )
 
 @app.route('/genres')
@@ -1172,10 +1214,6 @@ def view_eras():
 @app.route('/watchlist')
 def view_watchlist():
     return render_template('watchlist.html', active_page='watchlist')
-
-@app.route('/dashboard')
-def view_dashboard():
-    return render_template('dashboard.html', active_page='dashboard')
 
 @app.route('/chatbot')
 def view_chatbot():

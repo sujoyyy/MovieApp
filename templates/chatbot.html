@@ -80,7 +80,7 @@
     function showChatbotMovie(idx) {
         const m = window.chatbotMovies[idx];
         if (m) {
-            alert(`${m.title} (${m.year})\n⭐ Rating: ${m.rating}/10\nGenres: ${m.genres}\n\nPlot: ${m.plot}`);
+            openMovieDetail(m);
         }
     }
 
