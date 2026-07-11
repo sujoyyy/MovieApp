@@ -4,27 +4,17 @@
 
 {% block extra_head %}
 <style>
-    .poster-gradient {
-        background: linear-gradient(to top, rgba(18, 20, 20, 0.95) 0%, rgba(18, 20, 20, 0) 60%);
-    }
     .genre-card {
         transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.3s ease, box-shadow 0.3s ease;
     }
     .genre-card:hover {
         transform: translateY(-4px) scale(1.02);
     }
-    .movie-card-hover {
-        transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-    }
-    .movie-card-hover:hover {
-        transform: translateY(-8px) scale(1.04);
-        box-shadow: 0 20px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(229, 9, 20, 0.15);
-    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="px-margin-mobile md:px-margin-desktop py-12 space-y-12">
+<div class="px-margin-mobile md:px-margin-desktop pt-24 pb-12 space-y-12">
     
     <!-- Title -->
     <div>
@@ -38,7 +28,7 @@
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
             <!-- Sci-Fi -->
             <div id="card-Sci-Fi" onclick="selectGenre('Sci-Fi')" class="genre-card group relative h-40 rounded-xl overflow-hidden cursor-pointer border border-white/10">
-                <img class="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEx1E2zrjGYBdMqI0bc4mj6CvjESpzDKyVtZgZB2-C8W5UFJEgZHB_3uYhZa3FkV8250EBA8Bi831v45wpoRFgbBlR5MXpJioBwYwFc7-Sg4QNS8vjEgA2mB9x1Z-BU_Q1bW7l9vzQv_gtiPSjPm1PxjVCbt9UkS_XhOTzCubhCvyuUYkr3OyFmFFKEInWItIaQJ5IPI2Q8hflYOYFc9VWYmzTgjvVz0k5rzR1ne_ADDDgBlm49ttrQTb8-cs7AJzlAZPZ7lXrGDVL" alt="Sci-Fi"/>
+                <img class="absolute inset-0 w-full h-full object-cover transition-all duration-500" src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=800&auto=format&fit=crop" alt="Sci-Fi"/>
                 <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
                 <div class="absolute bottom-4 left-4">
                     <p class="font-headline-lg text-white text-2xl">Sci-Fi</p>
@@ -48,7 +38,7 @@
 
             <!-- Thriller (Active Red by default) -->
             <div id="card-Thriller" onclick="selectGenre('Thriller')" class="genre-card group relative h-40 rounded-xl overflow-hidden cursor-pointer border border-on-tertiary-container ring-2 ring-on-tertiary-container">
-                <img class="absolute inset-0 w-full h-full object-cover transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCeR687tMCjMR1urcYvTM1Bzx4uzqLyfQVsNHeeNZjSMERiALdIeu5F4qKi5MkYoD5Qryc4MVTqbpRotaAl8IQT8h9pRlJ7EQHpQLoxdGAiuMHleEgYxwa9lMqAvXoVi4jYPu8FgqmfDEU6pvIvtalH4-vat8DMHNKdYGYV-LDQyPorpsvMHjJ-jsIi8pRM-_V3Z1i4F2oFxnx3-cKDMhsVgSdN_MO7JOI9J4ZBQQ8rbl7FjRO6Dzp84K1OWPe06yKcrQcIiiY2iAOb" alt="Thriller"/>
+                <img class="absolute inset-0 w-full h-full object-cover transition-all duration-500" src="https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?q=80&w=800&auto=format&fit=crop" alt="Thriller"/>
                 <div class="absolute inset-0 bg-gradient-to-t from-on-tertiary-container/60 via-black/20 to-transparent"></div>
                 <div class="absolute bottom-4 left-4">
                     <p class="font-headline-lg text-white text-2xl">Thriller</p>
@@ -58,7 +48,7 @@
 
             <!-- Action -->
             <div id="card-Action" onclick="selectGenre('Action')" class="genre-card group relative h-40 rounded-xl overflow-hidden cursor-pointer border border-white/10">
-                <img class="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyTq7R5gSkUsqJfEoiWdFIOV8QI1NOAwlyto5Z6tBJdvIBHRfaVKJcivKrOJDVLT1LvANBdPcCD2bpdn4Z2YxKV8TFQCjlheVbN51-7I0IGFgHHQSS2WPDZqwlepC5W0VjGLCs6Kc8cQk-qUfDd4LD8ubqA19Iwd2KLtyVv9VK0bEKxox-K281Y9s3YO9Ro7uocs1IwhGTm2K-4KYu-iuOCWowbmI3-w3g-cUHpZQHx9B4RnWxSe3-_Uq38UxmyPXI-dCBOjDnD5-X" alt="Action"/>
+                <img class="absolute inset-0 w-full h-full object-cover transition-all duration-500" src="https://images.unsplash.com/photo-1508962914676-134849a727f0?q=80&w=800&auto=format&fit=crop" alt="Action"/>
                 <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
                 <div class="absolute bottom-4 left-4">
                     <p class="font-headline-lg text-white text-2xl">Action</p>
@@ -68,7 +58,7 @@
 
             <!-- Drama -->
             <div id="card-Dramas" onclick="selectGenre('Dramas')" class="genre-card group relative h-40 rounded-xl overflow-hidden cursor-pointer border border-white/10">
-                <img class="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCc9ckhg8w5RuOvUKmtlweziayNvpbm6lMNkOV4qFtXSycyTInO1LgT6cM_-qGSBHjUpAna4Kqp8NK8qEiTdH8VJnWINCRToaBnWd853wIExbtXcMbxrGdcc8MoP7AXQmpKcs_x3pZ4KJS3ZDHYwKNADoWUtldlXTcEhRGJFcSoZ4FQSigvRIFhQJc404kdZuzfzY8eLIu05V7aDE8nc7Yf1o76fDPbW8NQHXXaqbM2JSS5bjLgaO6uCpXEIISq0in54_CyPKt86s_m" alt="Drama"/>
+                <img class="absolute inset-0 w-full h-full object-cover transition-all duration-500" src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=800&auto=format&fit=crop" alt="Drama"/>
                 <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
                 <div class="absolute bottom-4 left-4">
                     <p class="font-headline-lg text-white text-2xl">Drama</p>
@@ -78,7 +68,7 @@
 
             <!-- Comedy -->
             <div id="card-Comedies" onclick="selectGenre('Comedies')" class="genre-card group relative h-40 rounded-xl overflow-hidden cursor-pointer border border-white/10">
-                <img class="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDM5CLnr4Q8EHMQh_aEk4aF4p1MTV6Ghg9520tLj9pvQv5H9rblbJGJnK-NThG-pnu6J1of-55sYAFlCiew4hZNO8YlTav3kp6dxxTogZWJC12mkaakSGeKU8qf577k7mtlBMUHibM0cgesBG1-9GVQGY2btRcNqeq7aEs8wjKQ1BXHdVOdydw2vsLf71x90DtJqgn0I6lKdXQZQz0Vfi3yr_p0YKW__Fg3sfbFcsO7RzfkWYqlUNa3I-O9QP5ncfr_78kfImxRRrb9" alt="Comedy"/>
+                <img class="absolute inset-0 w-full h-full object-cover transition-all duration-500" src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=800&auto=format&fit=crop" alt="Comedy"/>
                 <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
                 <div class="absolute bottom-4 left-4">
                     <p class="font-headline-lg text-white text-2xl">Comedy</p>
@@ -88,7 +78,7 @@
 
             <!-- Romantic -->
             <div id="card-Romantic" onclick="selectGenre('Romantic')" class="genre-card group relative h-40 rounded-xl overflow-hidden cursor-pointer border border-white/10">
-                <img class="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9Z-Oxs3s-xxnQvLxlPOpV8CTv_vaqhmzh9xEZBLppJlnhDYsDtsHDk8xFiGXy-nrILH1HP3i_tkkTyZrVNVyDDk0tb7dEWgU_FIVapEi16tHlTF7CQMNcJRD66oEbO6Abpb4Sukt9aPumWWO6xxxeWerVr9BbzBCQ2NDoQjjdsak-AigGWnDDe5X70k6CQts1hoxAmGk-KA0MZ-4hrDx6YQU5hE8h1NuOiuYliQgKSDCMKm3RT7L6YH4XUfpYz4kzL6Y7e5tFf-vy" alt="Romantic"/>
+                <img class="absolute inset-0 w-full h-full object-cover transition-all duration-500" src="https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=800&auto=format&fit=crop" alt="Romantic"/>
                 <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
                 <div class="absolute bottom-4 left-4">
                     <p class="font-headline-lg text-white text-2xl">Romantic</p>
@@ -98,7 +88,7 @@
 
             <!-- Crime -->
             <div id="card-Crime" onclick="selectGenre('Crime')" class="genre-card group relative h-40 rounded-xl overflow-hidden cursor-pointer border border-white/10">
-                <img class="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBVWwIgw-GblFx8Od9W6U0ToHjCFRj92a3zo4u9DTtMB277dbscBM7zxtnem0fpjuMOAaokH8jEUYtCQU41H7R3KSCLKs37H8-O1ZUJ27RRzm4IQ_3C1l342AdcD49IBd8uh9PWU8lS2lm7eRswE0rn4m2PCSahTDN46KYo--QpIjhcBrmmdA89-xSGRndUmpzGD8ZAMskP0-vzMhViN7fzjmOZsqatBvtea4X2ct9IGjXnnmBM9Jb2ECSrgsUGCb5Q8NbEIfktrtL" alt="Crime"/>
+                <img class="absolute inset-0 w-full h-full object-cover transition-all duration-500" src="https://images.unsplash.com/photo-1518156677180-95a2893f3e9f?q=80&w=800&auto=format&fit=crop" alt="Crime"/>
                 <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
                 <div class="absolute bottom-4 left-4">
                     <p class="font-headline-lg text-white text-2xl">Crime</p>
@@ -108,7 +98,7 @@
 
             <!-- Fantasy -->
             <div id="card-Fantasy" onclick="selectGenre('Fantasy')" class="genre-card group relative h-40 rounded-xl overflow-hidden cursor-pointer border border-white/10">
-                <img class="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCuVEu8VdC2g5Glc0Um7ASDKn3AkSE9UsIqRII-m_sotwAqup8bmWhnUQt0Un1lcA6lOry3VPfSINHjpkSB-hpONDSK9kpDlshPaiM2dLmHT0AZLcS6pplYTd9-Da778aL9-lQVYUrxp0WeZXhXXoQKTlwnjzZW5z4m0VdrfKnVFqHOYql9uYCIxAV65KQJ0EU-x4LXEb5bPABuSGjpSPaxHF3R_llD7LB96yq1Vlwn01-ji98NLWc3wjWbA-UqSdo19pxjYHYnfdkG" alt="Fantasy"/>
+                <img class="absolute inset-0 w-full h-full object-cover transition-all duration-500" src="https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=800&auto=format&fit=crop" alt="Fantasy"/>
                 <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
                 <div class="absolute bottom-4 left-4">
                     <p class="font-headline-lg text-white text-2xl">Fantasy</p>
@@ -118,7 +108,7 @@
 
             <!-- Mystery -->
             <div id="card-Mystery" onclick="selectGenre('Mystery')" class="genre-card group relative h-40 rounded-xl overflow-hidden cursor-pointer border border-white/10">
-                <img class="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIfsgO4TpOH58un6IP8d9ktuQE7jhb74Qk7oCQ7g1nrsIXYRjCWIvFXmi6TcjNRl2MGd8Z-UDNkvfRbxYIyuaaLHmjLkhEe7_taqlzsYVcDod_S50alTvijmDtSSKOfSffcZHQQAXUQExA9XzFdO-7Vr2l3qGKte2i8dVI1J7pTV-gRGDVe5L4TCknJz83ICBLT8Yln11pzLJ7kQdH2pl_IvIyWhlzNnJhyPxY3DjC2eZueClclOWB9Sm2yMvVikaQXGe0OVDVpxdm" alt="Mystery"/>
+                <img class="absolute inset-0 w-full h-full object-cover transition-all duration-500" src="https://images.unsplash.com/photo-1519074002996-a69e7ac46a42?q=80&w=800&auto=format&fit=crop" alt="Mystery"/>
                 <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
                 <div class="absolute bottom-4 left-4">
                     <p class="font-headline-lg text-white text-2xl">Mystery</p>
@@ -128,7 +118,7 @@
 
             <!-- Biopic -->
             <div id="card-Biopic" onclick="selectGenre('Biopic')" class="genre-card group relative h-40 rounded-xl overflow-hidden cursor-pointer border border-white/10">
-                <img class="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCl8lcwAK-Zb2CVgQteScJIY0ulA6LMYWrXevNSLs5lH7-_qVhrUd8GHurLrGeLThl3UPHc45g4B8ssyllEi0ifrGlBAtu_7DFzmRdS5cT-M9XftDrJ9SH8eETm0O-wwgt-IBZ4jLzX6WCDT8AY_CbyRz1agwk3MNFeQOfEyjtAOZQOBK1nsa5R6Uid_YGCC1SMFKavsXBCmgAF0TZ7BQlFIqdtmKYkwAl7NmVkVI5Nz-CY47gOMyx-s5M0NHmUwEBffqV_-CmLkkxp" alt="Biopic"/>
+                <img class="absolute inset-0 w-full h-full object-cover transition-all duration-500" src="https://images.unsplash.com/photo-1447069387593-a5de0862481e?q=80&w=800&auto=format&fit=crop" alt="Biopic"/>
                 <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
                 <div class="absolute bottom-4 left-4">
                     <p class="font-headline-lg text-white text-2xl">Biopic</p>
@@ -138,7 +128,7 @@
 
             <!-- Horror Comedy -->
             <div id="card-Horror" onclick="selectGenre('Horror')" class="genre-card group relative h-40 rounded-xl overflow-hidden cursor-pointer border border-white/10">
-                <img class="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMRMTn3evS40c8iIS4E6mSdtHSXcCai6SFTDkBP2ULFxrJuYnQvh3fkcgKjQ54sy8IlOSZ-mSQCH1WdlO9PfFEPTmYeD4A-odp6us3uNBsumvnCx9pdpQ_DWN-XysS8hJEkKG_Z62WSCXTUrc7meaLoB6GPCryUD6NQ_msw1gcCgqakCVpYSrs11G8jDA1EIJnCAJmGk_kpYUJnNOMc9jtQ1tiWbhXtBtVik8hdAv-vyIxzS_oU3ICHd7PPB97jJ3xuDN2RmFH2FwY" alt="Horror Comedy"/>
+                <img class="absolute inset-0 w-full h-full object-cover transition-all duration-500" src="https://images.unsplash.com/photo-1509248961158-e54f6934749c?q=80&w=800&auto=format&fit=crop" alt="Horror Comedy"/>
                 <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
                 <div class="absolute bottom-4 left-4">
                     <p class="font-headline-lg text-white text-2xl">Horror Comedy</p>
@@ -311,7 +301,7 @@
                                         <span class="material-symbols-outlined text-[11px]">bookmark</span>
                                         Watchlist
                                     </button>
-                                    <span class="text-[10px] text-on-tertiary-container font-extrabold">⭐ ${movie.rating}</span>
+                                    <span class="text-[10px] text-on-tertiary-container font-extrabold">★ ${movie.rating}</span>
                                 </div>
                             </div>
                         </div>

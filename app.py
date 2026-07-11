@@ -8,6 +8,7 @@ import datetime
 import os
 import threading
 import time
+import random
 from dotenv import load_dotenv
 import google.generativeai as genai
 
@@ -361,7 +362,7 @@ def query_movies(selected_genres=None, era=None, max_runtime=240, industry='All'
         
     # 5. Industry filtering
     if industry == 'Bollywood':
-        sql += " AND language IN ('Hindi', 'Bengali')"
+        sql += " AND language IN ('Hindi', 'Bengali', 'Telugu', 'Malayalam')"
     elif industry == 'Hollywood':
         sql += " AND language = 'English'"
         
@@ -608,6 +609,9 @@ def api_movies():
     
     selected_genres = [g.strip() for g in genres.split(',') if g.strip()] if genres else None
     
+    # Query a larger pool of movies to allow shuffling
+    query_limit = max(120, limit * 2)
+    
     results = query_movies(
         selected_genres=selected_genres,
         era=era,
@@ -615,12 +619,17 @@ def api_movies():
         industry=industry,
         query_str=query_str,
         sort_by=sort_by,
-        limit=limit,
+        limit=query_limit,
         language=language,
         mood=mood,
         user_id=user_id
     )
-    return jsonify(results)
+    
+    # Randomly shuffle results to show different suggestions
+    random.shuffle(results)
+    
+    # Return the sliced results matching original limit
+    return jsonify(results[:limit])
 
 # Real-time interactive Like/Dislike Endpoint to customize collaborative preferences dynamically
 @app.route('/api/like', methods=['POST'])
@@ -1067,16 +1076,22 @@ def api_chatbot():
 def api_dashboard():
     user_id = request.args.get('user_id', 1, type=int)
     
-    # 1. Top Rated Movies: sorted by rating DESC
-    top_rated = query_movies(sort_by='rating', limit=8, user_id=user_id)
+    # 1. Top Rated Movies
+    pool_top_rated = query_movies(sort_by='rating', limit=40, user_id=user_id)
+    random.shuffle(pool_top_rated)
+    top_rated = pool_top_rated[:12]
     
-    # 2. New Releases: sorted by release_year DESC
-    new_releases = query_movies(sort_by='release_year', limit=8, user_id=user_id)
+    # 2. New Releases
+    pool_new_releases = query_movies(sort_by='release_year', limit=40, user_id=user_id)
+    random.shuffle(pool_new_releases)
+    new_releases = pool_new_releases[:12]
     
-    # 3. Trending: high rating + modern movies
-    trending = query_movies(era='Modern', sort_by='rating', limit=8, user_id=user_id)
+    # 3. Trending
+    pool_trending = query_movies(era='Modern', sort_by='rating', limit=40, user_id=user_id)
+    random.shuffle(pool_trending)
+    trending = pool_trending[:12]
     
-    # 4. Most Watched: query movies based on interactions table
+    # 4. Most Watched
     conn = sqlite3.connect('movies.db', timeout=10)
     cursor = conn.cursor()
     cursor.execute("""
@@ -1084,22 +1099,26 @@ def api_dashboard():
         FROM interactions 
         GROUP BY movie_title 
         ORDER BY count DESC 
-        LIMIT 8
+        LIMIT 40
     """)
     most_watched_rows = cursor.fetchall()
     conn.close()
     
-    most_watched = []
+    pool_most_watched = []
     for title, count in most_watched_rows:
-        # Retrieve full movie record
         res = query_movies(query_str=title, limit=1, user_id=user_id)
         if res:
-            most_watched.append(res[0])
+            pool_most_watched.append(res[0])
             
-    # Default fallback for most watched if empty
-    if not most_watched:
-        most_watched = query_movies(limit=8, user_id=user_id)
-        
+    if len(pool_most_watched) < 12:
+        backfill = query_movies(limit=40, user_id=user_id)
+        for m in backfill:
+            if m not in pool_most_watched:
+                pool_most_watched.append(m)
+                
+    random.shuffle(pool_most_watched)
+    most_watched = pool_most_watched[:12]
+    
     return jsonify({
         'trending': trending,
         'top_rated': top_rated,
@@ -1111,6 +1130,14 @@ def api_dashboard():
 def index():
     results = None
     search_triggered = False
+    
+    # Get filters from session or use defaults
+    selected_genres = session.get('selected_genres', [])
+    selected_era = session.get('selected_era', 'Modern')
+    selected_runtime = session.get('selected_runtime', 150)
+    selected_industry = session.get('selected_industry', 'All')
+    selected_language = session.get('selected_language', 'All')
+    selected_mood = session.get('selected_mood', '')
     
     hero_list = query_movies(selected_genres=['Sci-Fi'], limit=1)
     hero_movie = hero_list[0] if hero_list else {
@@ -1138,26 +1165,40 @@ def index():
                     max_runtime=nlp_filters['max_runtime'],
                     query_str=nlp_filters['similar_movie'] if nlp_filters['similar_movie'] else search_q
                 )
+                if nlp_filters['genres']:
+                    selected_genres = nlp_filters['genres']
+                if nlp_filters['era']:
+                    selected_era = nlp_filters['era']
+                if nlp_filters['max_runtime'] < 240:
+                    selected_runtime = nlp_filters['max_runtime']
             else:
                 results = query_movies(query_str=search_q)
             search_triggered = True
         else:
-            genres = request.form.getlist('genres')
-            era = request.form.get('era')
-            max_runtime = int(request.form.get('runtime', 240))
-            industry = request.form.get('industry', 'All')
-            language = request.form.get('language', 'All')
-            mood = request.form.get('mood', '')
+            selected_genres = request.form.getlist('genres')
+            selected_era = request.form.get('era')
+            selected_runtime = int(request.form.get('runtime', 240))
+            selected_industry = request.form.get('industry', 'All')
+            selected_language = request.form.get('language', 'All')
+            selected_mood = request.form.get('mood', '')
             
             results = query_movies(
-                selected_genres=genres, 
-                era=era, 
-                max_runtime=max_runtime, 
-                industry=industry,
-                language=language,
-                mood=mood if mood != '' else None
+                selected_genres=selected_genres, 
+                era=selected_era, 
+                max_runtime=selected_runtime, 
+                industry=selected_industry,
+                language=selected_language,
+                mood=selected_mood if selected_mood != '' else None
             )
             search_triggered = True
+            
+        # Update session
+        session['selected_genres'] = selected_genres
+        session['selected_era'] = selected_era
+        session['selected_runtime'] = selected_runtime
+        session['selected_industry'] = selected_industry
+        session['selected_language'] = selected_language
+        session['selected_mood'] = selected_mood
 
     trending = None
     most_watched = None
@@ -1165,12 +1206,29 @@ def index():
     new_releases = None
 
     if results is None:
-        # Load dashboard suggestion shelves on default load
-        trending = query_movies(era='Modern', sort_by='rating', limit=8)
-        top_rated = query_movies(sort_by='rating', limit=8)
-        new_releases = query_movies(sort_by='release_year', limit=8)
+        # Load dashboard suggestion shelves with mixed & shuffled content (50% English, 50% Indian)
+        # 1. Trending (Modern era)
+        pool_trend_eng = query_movies(language='English', era='Modern', sort_by='rating', limit=30)
+        pool_trend_ind = query_movies(industry='Bollywood', era='Modern', sort_by='rating', limit=30)
+        pool_trending = pool_trend_eng + pool_trend_ind
+        random.shuffle(pool_trending)
+        trending = pool_trending[:12]
         
-        # Most Watched
+        # 2. Top Rated
+        pool_top_eng = query_movies(language='English', sort_by='rating', limit=30)
+        pool_top_ind = query_movies(industry='Bollywood', sort_by='rating', limit=30)
+        pool_top_rated = pool_top_eng + pool_top_ind
+        random.shuffle(pool_top_rated)
+        top_rated = pool_top_rated[:12]
+        
+        # 3. New Releases
+        pool_new_eng = query_movies(language='English', sort_by='release_year', limit=30)
+        pool_new_ind = query_movies(industry='Bollywood', sort_by='release_year', limit=30)
+        pool_new_releases = pool_new_eng + pool_new_ind
+        random.shuffle(pool_new_releases)
+        new_releases = pool_new_releases[:12]
+        
+        # 4. Most Watched
         conn = sqlite3.connect('movies.db', timeout=10)
         cursor = conn.cursor()
         cursor.execute("""
@@ -1178,18 +1236,27 @@ def index():
             FROM interactions 
             GROUP BY movie_title 
             ORDER BY count DESC 
-            LIMIT 8
+            LIMIT 40
         """)
         most_watched_rows = cursor.fetchall()
         conn.close()
         
-        most_watched = []
+        pool_most_watched = []
         for title, count in most_watched_rows:
             res = query_movies(query_str=title, limit=1)
             if res:
-                most_watched.append(res[0])
-        if not most_watched:
-            most_watched = query_movies(limit=8)
+                pool_most_watched.append(res[0])
+                
+        if len(pool_most_watched) < 12:
+            backfill_eng = query_movies(language='English', limit=30)
+            backfill_ind = query_movies(industry='Bollywood', limit=30)
+            backfill = backfill_eng + backfill_ind
+            for m in backfill:
+                if m not in pool_most_watched:
+                    pool_most_watched.append(m)
+                    
+        random.shuffle(pool_most_watched)
+        most_watched = pool_most_watched[:12]
             
     return render_template(
         'index.html', 
@@ -1200,7 +1267,13 @@ def index():
         trending=trending,
         most_watched=most_watched,
         top_rated=top_rated,
-        new_releases=new_releases
+        new_releases=new_releases,
+        selected_genres=selected_genres,
+        selected_era=selected_era,
+        selected_runtime=selected_runtime,
+        selected_industry=selected_industry,
+        selected_language=selected_language,
+        selected_mood=selected_mood
     )
 
 @app.route('/genres')
@@ -1219,5 +1292,5 @@ def view_watchlist():
 def view_chatbot():
     return render_template('chatbot.html', active_page='chatbot')
 
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    app.run(debug=True, port=5000)

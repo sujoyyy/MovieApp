@@ -4,19 +4,6 @@
 
 {% block extra_head %}
 <style>
-    .poster-gradient {
-        background: linear-gradient(to top, rgba(18, 20, 20, 0.95) 0%, rgba(18, 20, 20, 0) 60%);
-    }
-
-    .movie-card-hover {
-        transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-    }
-
-    .movie-card-hover:hover {
-        transform: translateY(-8px) scale(1.04);
-        box-shadow: 0 20px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(229, 9, 20, 0.15);
-    }
-
     /* Cinematic reveal animation: background glides up from down and fades in on page load */
     @keyframes heroReveal {
         0% {
@@ -37,37 +24,61 @@
 
 {% block content %}
 <!-- Cinematic Brand Hero Section (Netflix Landing style) -->
-<section class="relative w-full min-h-[82vh] flex items-center justify-center overflow-hidden border-b border-white/10">
+<section class="relative w-full min-h-[82vh] flex items-center justify-center overflow-hidden">
     <div class="absolute inset-0 z-0 overflow-hidden">
         <!-- Retro Movie Collage Backdrop -->
-        <img class="absolute inset-0 w-full h-full object-cover select-none pointer-events-none opacity-70 brightness-[0.38]"
-            id="hero-cover" src="{{ url_for('static', filename='images/hero_collage.jpg') }}"
+        <img class="absolute inset-0 w-full h-full object-cover select-none pointer-events-none opacity-95 brightness-[0.55]"
+            id="hero-cover" src="{{ url_for('static', filename='hero_bg.jpg') }}"
             alt="Cinematic Backdrop Collage" />
-        <div class="absolute inset-0 bg-black/60"></div>
-        <div class="absolute inset-0 bg-gradient-to-t from-background via-black/55 to-black/35"></div>
+        <div class="absolute inset-0 bg-black/30"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-background via-black/35 to-black/15"></div>
     </div>
 
     <div class="relative z-10 w-full max-w-[920px] mx-auto text-center px-6 md:px-10 pt-16 pb-10 flex flex-col items-center justify-center">
-        <h2 class="text-[2.65rem] sm:text-[3.8rem] md:text-[4.35rem] text-white mb-5 tracking-normal leading-[1.08] font-black max-w-[760px] text-glow" style="font-family: 'Inter', Arial, Helvetica, sans-serif;">
+        <h2 class="text-[3.18rem] sm:text-[4.56rem] md:text-[5.22rem] text-white mb-5 tracking-normal leading-[1.08] font-black max-w-[760px] text-glow" style="font-family: 'Unica One', sans-serif;">
             CineMatch
         </h2>
-        <p class="text-[1.18rem] sm:text-[1.35rem] md:text-[1.55rem] text-white mb-7 max-w-[820px] font-bold leading-snug tracking-normal text-glow" style="font-family: 'Inter', Arial, Helvetica, sans-serif;">
+        <p class="text-[1.06rem] sm:text-[1.21rem] md:text-[1.39rem] text-white mb-7 max-w-[820px] font-bold leading-snug tracking-normal text-glow" style="font-family: 'Pontano Sans', sans-serif;">
             CineMatch is an AI-powered recommendation engine that cuts through the noise to find your perfect movie match from thousands of titles.
         </p>
 
         <!-- Center Search Form styled exactly like Netflix's email field -->
-        <form action="/" method="POST" class="w-full max-w-[736px] mb-8 flex flex-col sm:flex-row gap-2 sm:gap-2 items-stretch justify-center">
+        <form action="/" method="POST" class="w-full max-w-[580px] mb-8 flex flex-col sm:flex-row gap-2 sm:gap-2 items-stretch justify-center">
             <input name="search_q" 
-                   class="flex-grow min-h-[56px] md:min-h-[70px] bg-black/35 border border-white/45 rounded px-5 md:px-6 text-white text-base md:text-xl focus:ring-2 focus:ring-white focus:outline-none placeholder-white/70 shadow-2xl backdrop-blur-sm" 
+                   class="flex-grow min-h-[38px] md:min-h-[46px] bg-black/35 border border-white/45 rounded px-4 md:px-5 text-white text-[13px] md:text-[15px] focus:ring-2 focus:ring-white focus:outline-none placeholder-white/70 shadow-2xl backdrop-blur-sm" 
                    placeholder="Search films, genres, directors, moods, similar plots..." 
                    type="text"/>
             <button type="submit" 
-                    class="min-h-[56px] md:min-h-[70px] bg-[#e50914] hover:bg-[#c11119] active:scale-[0.98] transition-all text-white font-extrabold text-xl md:text-3xl tracking-normal px-7 md:px-9 rounded shrink-0 flex items-center justify-center gap-2 shadow-2xl" style="font-family: 'Inter', Arial, Helvetica, sans-serif;">
+                    class="min-h-[38px] md:min-h-[46px] bg-[#e50914] hover:bg-[#c11119] active:scale-[0.98] transition-all text-white font-extrabold text-xs md:text-sm tracking-normal px-4 md:px-6 rounded shrink-0 flex items-center justify-center gap-1 shadow-2xl" style="font-family: 'Inter', Arial, Helvetica, sans-serif;">
                 GET STARTED
-                <span class="material-symbols-outlined text-3xl md:text-4xl">chevron_right</span>
+                <span class="material-symbols-outlined text-lg md:text-xl">chevron_right</span>
             </button>
         </form>
 
+    </div>
+
+    <!-- Curved Neon Glow Divider at the Bottom -->
+    <div class="absolute bottom-0 left-0 w-full overflow-hidden leading-none z-10">
+        <svg class="relative block w-[150%] h-[40px] md:h-[60px] left-1/2 -translate-x-1/2" viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <defs>
+                <linearGradient id="neon-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#E50914"></stop>
+                    <stop offset="50%" stop-color="#ff2e93"></stop>
+                    <stop offset="100%" stop-color="#E50914"></stop>
+                </linearGradient>
+                <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="5" result="blur"></feGaussianBlur>
+                    <feMerge>
+                        <feMergeNode in="blur"></feMergeNode>
+                        <feMergeNode in="SourceGraphic"></feMergeNode>
+                    </feMerge>
+                </filter>
+            </defs>
+            <!-- Curve Path filled with body background color -->
+            <path d="M0,0 Q600,120 1200,0 L1200,120 L0,120 Z" fill="#121414"></path>
+            <!-- Neon Glow Curve Line -->
+            <path d="M0,0 Q600,120 1200,0" fill="none" stroke="url(#neon-grad)" stroke-width="4" filter="url(#glow)"></path>
+        </svg>
     </div>
 </section>
 
@@ -91,57 +102,57 @@
                         <label
                             class="flex items-center gap-3 p-4 bg-white/5 border border-white/5 hover:border-on-tertiary-container hover:bg-white/10 hover:-translate-y-0.5 rounded-lg cursor-pointer transition-all duration-200 text-on-surface">
                             <input
-                                class="appearance-none w-5 h-5 border border-white/30 rounded checked:bg-on-tertiary-container checked:border-on-tertiary-container checked:shadow-lg checked:shadow-on-tertiary-container/30 focus:ring-0 cursor-pointer transition-all"
-                                type="checkbox" name="genres" value="Sci-Fi" />
+                                class="appearance-none w-5 h-5 border border-white/30 rounded checked:bg-on-tertiary-container checked:border-on-tertiary-container checked:shadow-lg checked:shadow-on-tertiary-container/30 text-on-tertiary-container focus:ring-0 cursor-pointer transition-all"
+                                type="checkbox" name="genres" value="Sci-Fi" {% if 'Sci-Fi' in selected_genres %}checked{% endif %} />
                             <span class="text-sm font-semibold">Sci-Fi</span>
                         </label>
                         <label
                             class="flex items-center gap-3 p-4 bg-white/5 border border-white/5 hover:border-on-tertiary-container hover:bg-white/10 hover:-translate-y-0.5 rounded-lg cursor-pointer transition-all duration-200 text-on-surface">
                             <input
-                                class="appearance-none w-5 h-5 border border-white/30 rounded checked:bg-on-tertiary-container checked:border-on-tertiary-container checked:shadow-lg checked:shadow-on-tertiary-container/30 focus:ring-0 cursor-pointer transition-all"
-                                type="checkbox" name="genres" value="Thriller" />
+                                class="appearance-none w-5 h-5 border border-white/30 rounded checked:bg-on-tertiary-container checked:border-on-tertiary-container checked:shadow-lg checked:shadow-on-tertiary-container/30 text-on-tertiary-container focus:ring-0 cursor-pointer transition-all"
+                                type="checkbox" name="genres" value="Thriller" {% if 'Thriller' in selected_genres %}checked{% endif %} />
                             <span class="text-sm font-semibold">Thriller</span>
                         </label>
                         <label
                             class="flex items-center gap-3 p-4 bg-white/5 border border-white/5 hover:border-on-tertiary-container hover:bg-white/10 hover:-translate-y-0.5 rounded-lg cursor-pointer transition-all duration-200 text-on-surface">
                             <input
-                                class="appearance-none w-5 h-5 border border-white/30 rounded checked:bg-on-tertiary-container checked:border-on-tertiary-container checked:shadow-lg checked:shadow-on-tertiary-container/30 focus:ring-0 cursor-pointer transition-all"
-                                type="checkbox" name="genres" value="Action" />
+                                class="appearance-none w-5 h-5 border border-white/30 rounded checked:bg-on-tertiary-container checked:border-on-tertiary-container checked:shadow-lg checked:shadow-on-tertiary-container/30 text-on-tertiary-container focus:ring-0 cursor-pointer transition-all"
+                                type="checkbox" name="genres" value="Action" {% if 'Action' in selected_genres %}checked{% endif %} />
                             <span class="text-sm font-semibold">Action</span>
                         </label>
                         <label
                             class="flex items-center gap-3 p-4 bg-white/5 border border-white/5 hover:border-on-tertiary-container hover:bg-white/10 hover:-translate-y-0.5 rounded-lg cursor-pointer transition-all duration-200 text-on-surface">
                             <input
-                                class="appearance-none w-5 h-5 border border-white/30 rounded checked:bg-on-tertiary-container checked:border-on-tertiary-container checked:shadow-lg checked:shadow-on-tertiary-container/30 focus:ring-0 cursor-pointer transition-all"
-                                type="checkbox" name="genres" value="Comedies" />
+                                class="appearance-none w-5 h-5 border border-white/30 rounded checked:bg-on-tertiary-container checked:border-on-tertiary-container checked:shadow-lg checked:shadow-on-tertiary-container/30 text-on-tertiary-container focus:ring-0 cursor-pointer transition-all"
+                                type="checkbox" name="genres" value="Comedies" {% if 'Comedies' in selected_genres %}checked{% endif %} />
                             <span class="text-sm font-semibold">Comedy</span>
                         </label>
                         <label
                             class="flex items-center gap-3 p-4 bg-white/5 border border-white/5 hover:border-on-tertiary-container hover:bg-white/10 hover:-translate-y-0.5 rounded-lg cursor-pointer transition-all duration-200 text-on-surface">
                             <input
-                                class="appearance-none w-5 h-5 border border-white/30 rounded checked:bg-on-tertiary-container checked:border-on-tertiary-container checked:shadow-lg checked:shadow-on-tertiary-container/30 focus:ring-0 cursor-pointer transition-all"
-                                type="checkbox" name="genres" value="Dramas" />
+                                class="appearance-none w-5 h-5 border border-white/30 rounded checked:bg-on-tertiary-container checked:border-on-tertiary-container checked:shadow-lg checked:shadow-on-tertiary-container/30 text-on-tertiary-container focus:ring-0 cursor-pointer transition-all"
+                                type="checkbox" name="genres" value="Dramas" {% if 'Dramas' in selected_genres %}checked{% endif %} />
                             <span class="text-sm font-semibold">Drama</span>
                         </label>
                         <label
                             class="flex items-center gap-3 p-4 bg-white/5 border border-white/5 hover:border-on-tertiary-container hover:bg-white/10 hover:-translate-y-0.5 rounded-lg cursor-pointer transition-all duration-200 text-on-surface">
                             <input
-                                class="appearance-none w-5 h-5 border border-white/30 rounded checked:bg-on-tertiary-container checked:border-on-tertiary-container checked:shadow-lg checked:shadow-on-tertiary-container/30 focus:ring-0 cursor-pointer transition-all"
-                                type="checkbox" name="genres" value="Horror" />
+                                class="appearance-none w-5 h-5 border border-white/30 rounded checked:bg-on-tertiary-container checked:border-on-tertiary-container checked:shadow-lg checked:shadow-on-tertiary-container/30 text-on-tertiary-container focus:ring-0 cursor-pointer transition-all"
+                                type="checkbox" name="genres" value="Horror" {% if 'Horror' in selected_genres %}checked{% endif %} />
                             <span class="text-sm font-semibold">Horror</span>
                         </label>
                         <label
                             class="flex items-center gap-3 p-4 bg-white/5 border border-white/5 hover:border-on-tertiary-container hover:bg-white/10 hover:-translate-y-0.5 rounded-lg cursor-pointer transition-all duration-200 text-on-surface">
                             <input
-                                class="appearance-none w-5 h-5 border border-white/30 rounded checked:bg-on-tertiary-container checked:border-on-tertiary-container checked:shadow-lg checked:shadow-on-tertiary-container/30 focus:ring-0 cursor-pointer transition-all"
-                                type="checkbox" name="genres" value="Documentaries" />
+                                class="appearance-none w-5 h-5 border border-white/30 rounded checked:bg-on-tertiary-container checked:border-on-tertiary-container checked:shadow-lg checked:shadow-on-tertiary-container/30 text-on-tertiary-container focus:ring-0 cursor-pointer transition-all"
+                                type="checkbox" name="genres" value="Documentaries" {% if 'Documentaries' in selected_genres %}checked{% endif %} />
                             <span class="text-sm font-semibold">Documentary</span>
                         </label>
                         <label
                             class="flex items-center gap-3 p-4 bg-white/5 border border-white/5 hover:border-on-tertiary-container hover:bg-white/10 hover:-translate-y-0.5 rounded-lg cursor-pointer transition-all duration-200 text-on-surface">
                             <input
-                                class="appearance-none w-5 h-5 border border-white/30 rounded checked:bg-on-tertiary-container checked:border-on-tertiary-container checked:shadow-lg checked:shadow-on-tertiary-container/30 focus:ring-0 cursor-pointer transition-all"
-                                type="checkbox" name="genres" value="Romantic" />
+                                class="appearance-none w-5 h-5 border border-white/30 rounded checked:bg-on-tertiary-container checked:border-on-tertiary-container checked:shadow-lg checked:shadow-on-tertiary-container/30 text-on-tertiary-container focus:ring-0 cursor-pointer transition-all"
+                                type="checkbox" name="genres" value="Romantic" {% if 'Romantic' in selected_genres %}checked{% endif %} />
                             <span class="text-sm font-semibold">Romance</span>
                         </label>
                     </div>
@@ -150,25 +161,33 @@
                 <!-- Right Column: Industry, Era, Runtime, Language, Mood -->
                 <div class="flex flex-col gap-6">
 
-                    <!-- Industry & Language Row -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Industry, Language & Era Row -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <!-- Industry -->
                         <div class="space-y-3">
                             <div class="flex items-center gap-3">
                                 <span class="text-on-tertiary-container font-extrabold text-title-md">02 /</span>
                                 <h3 class="text-on-surface font-title-md uppercase tracking-wider">Film Industry</h3>
                             </div>
-                            <div
-                                class="relative bg-white/5 border border-white/5 hover:border-on-tertiary-container rounded-lg p-3 transition-colors duration-200">
-                                <select name="industry"
-                                    class="w-full bg-transparent border-none text-on-surface text-sm focus:ring-0 focus:outline-none cursor-pointer">
-                                    <option value="All" class="bg-surface-container-high text-on-surface">All Regions
-                                        (Global)</option>
-                                    <option value="Hollywood" class="bg-surface-container-high text-on-surface">
-                                        Hollywood (Western)</option>
-                                    <option value="Bollywood" class="bg-surface-container-high text-on-surface">
-                                        Bollywood (Indian)</option>
+                            <div class="relative bg-white/5 border border-white/5 hover:border-on-tertiary-container rounded-lg p-3 transition-colors duration-200 custom-select-wrapper">
+                                <select name="industry" class="hidden">
+                                    <option value="All" {% if selected_industry == 'All' %}selected{% endif %}>All Regions (Global)</option>
+                                    <option value="Hollywood" {% if selected_industry == 'Hollywood' %}selected{% endif %}>Hollywood (Western)</option>
+                                    <option value="Bollywood" {% if selected_industry == 'Bollywood' %}selected{% endif %}>Bollywood (Indian)</option>
                                 </select>
+                                <button type="button" class="w-full flex justify-between items-center bg-transparent text-on-surface text-sm focus:outline-none cursor-pointer custom-select-trigger">
+                                    <span class="custom-select-label">
+                                        {% if selected_industry == 'Hollywood' %}Hollywood (Western)
+                                        {% elif selected_industry == 'Bollywood' %}Bollywood (Indian)
+                                        {% else %}All Regions (Global){% endif %}
+                                    </span>
+                                    <span class="material-symbols-outlined text-[18px] transition-transform duration-200 arrow-icon">expand_more</span>
+                                </button>
+                                <div class="custom-select-options absolute top-[calc(100%+8px)] left-0 right-0 z-50 bg-[#1e2020] border border-white/10 rounded-lg shadow-2xl max-h-60 overflow-y-auto hidden">
+                                    <div class="custom-option px-4 py-2.5 text-sm text-white/70 hover:bg-[#E50914] hover:text-white cursor-pointer transition-colors" data-value="All">All Regions (Global)</div>
+                                    <div class="custom-option px-4 py-2.5 text-sm text-white/70 hover:bg-[#E50914] hover:text-white cursor-pointer transition-colors" data-value="Hollywood">Hollywood (Western)</div>
+                                    <div class="custom-option px-4 py-2.5 text-sm text-white/70 hover:bg-[#E50914] hover:text-white cursor-pointer transition-colors" data-value="Bollywood">Bollywood (Indian)</div>
+                                </div>
                             </div>
                         </div>
 
@@ -178,70 +197,65 @@
                                 <span class="text-on-tertiary-container font-extrabold text-title-md">03 /</span>
                                 <h3 class="text-on-surface font-title-md uppercase tracking-wider">Language</h3>
                             </div>
-                            <div
-                                class="relative bg-white/5 border border-white/5 hover:border-on-tertiary-container rounded-lg p-3 transition-colors duration-200">
-                                <select name="language"
-                                    class="w-full bg-transparent border-none text-on-surface text-sm focus:ring-0 focus:outline-none cursor-pointer">
-                                    <option value="All" class="bg-surface-container-high text-on-surface">All Languages
-                                    </option>
-                                    <option value="English" class="bg-surface-container-high text-on-surface">English
-                                    </option>
-                                    <option value="Hindi" class="bg-surface-container-high text-on-surface">Hindi
-                                    </option>
-                                    <option value="Bengali" class="bg-surface-container-high text-on-surface">Bengali
-                                    </option>
+                            <div class="relative bg-white/5 border border-white/5 hover:border-on-tertiary-container rounded-lg p-3 transition-colors duration-200 custom-select-wrapper">
+                                <select name="language" class="hidden">
+                                    <option value="All" {% if selected_language == 'All' %}selected{% endif %}>All Languages</option>
+                                    <option value="English" {% if selected_language == 'English' %}selected{% endif %}>English</option>
+                                    <option value="Hindi" {% if selected_language == 'Hindi' %}selected{% endif %}>Hindi</option>
+                                    <option value="Bengali" {% if selected_language == 'Bengali' %}selected{% endif %}>Bengali</option>
+                                    <option value="Telugu" {% if selected_language == 'Telugu' %}selected{% endif %}>Telugu</option>
+                                    <option value="Malayalam" {% if selected_language == 'Malayalam' %}selected{% endif %}>Malayalam</option>
                                 </select>
+                                <button type="button" class="w-full flex justify-between items-center bg-transparent text-on-surface text-sm focus:outline-none cursor-pointer custom-select-trigger">
+                                    <span class="custom-select-label">
+                                        {% if selected_language == 'English' %}English
+                                        {% elif selected_language == 'Hindi' %}Hindi
+                                        {% elif selected_language == 'Bengali' %}Bengali
+                                        {% elif selected_language == 'Telugu' %}Telugu
+                                        {% elif selected_language == 'Malayalam' %}Malayalam
+                                        {% else %}All Languages{% endif %}
+                                    </span>
+                                    <span class="material-symbols-outlined text-[18px] transition-transform duration-200 arrow-icon">expand_more</span>
+                                </button>
+                                <div class="custom-select-options absolute top-[calc(100%+8px)] left-0 right-0 z-50 bg-[#1e2020] border border-white/10 rounded-lg shadow-2xl max-h-60 overflow-y-auto hidden">
+                                    <div class="custom-option px-4 py-2.5 text-sm text-white/70 hover:bg-[#E50914] hover:text-white cursor-pointer transition-colors" data-value="All">All Languages</div>
+                                    <div class="custom-option px-4 py-2.5 text-sm text-white/70 hover:bg-[#E50914] hover:text-white cursor-pointer transition-colors" data-value="English">English</div>
+                                    <div class="custom-option px-4 py-2.5 text-sm text-white/70 hover:bg-[#E50914] hover:text-white cursor-pointer transition-colors" data-value="Hindi">Hindi</div>
+                                    <div class="custom-option px-4 py-2.5 text-sm text-white/70 hover:bg-[#E50914] hover:text-white cursor-pointer transition-colors" data-value="Bengali">Bengali</div>
+                                    <div class="custom-option px-4 py-2.5 text-sm text-white/70 hover:bg-[#E50914] hover:text-white cursor-pointer transition-colors" data-value="Telugu">Telugu</div>
+                                    <div class="custom-option px-4 py-2.5 text-sm text-white/70 hover:bg-[#E50914] hover:text-white cursor-pointer transition-colors" data-value="Malayalam">Malayalam</div>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Release Era & AI Mood Row -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <!-- Release Era -->
                         <div class="space-y-3">
                             <div class="flex items-center gap-3">
                                 <span class="text-on-tertiary-container font-extrabold text-title-md">04 /</span>
                                 <h3 class="text-on-surface font-title-md uppercase tracking-wider">Release Era</h3>
                             </div>
-                            <div
-                                class="relative bg-white/5 border border-white/5 hover:border-on-tertiary-container rounded-lg p-3 transition-colors duration-200">
-                                <select name="era"
-                                    class="w-full bg-transparent border-none text-on-surface text-sm focus:ring-0 focus:outline-none cursor-pointer">
-                                    <option value="Modern" class="bg-surface-container-high text-on-surface">Modern
-                                        (&ge; 2010)</option>
-                                    <option value="2000s" class="bg-surface-container-high text-on-surface">2000s (2000
-                                        - 2009)</option>
-                                    <option value="90s" class="bg-surface-container-high text-on-surface">1990s (1990 -
-                                        1999)</option>
-                                    <option value="Classic" class="bg-surface-container-high text-on-surface">Classic
-                                        (&lt; 1990)</option>
+                            <div class="relative bg-white/5 border border-white/5 hover:border-on-tertiary-container rounded-lg p-3 transition-colors duration-200 custom-select-wrapper">
+                                <select name="era" class="hidden">
+                                    <option value="Modern" {% if selected_era == 'Modern' %}selected{% endif %}>Modern (&ge; 2010)</option>
+                                    <option value="2000s" {% if selected_era == '2000s' %}selected{% endif %}>2000s (2000 - 2009)</option>
+                                    <option value="90s" {% if selected_era == '90s' %}selected{% endif %}>1990s (1990 - 1999)</option>
+                                    <option value="Classic" {% if selected_era == 'Classic' %}selected{% endif %}>Classic (&lt; 1990)</option>
                                 </select>
-                            </div>
-                        </div>
-
-                        <!-- AI Mood -->
-                        <div class="space-y-3">
-                            <div class="flex items-center gap-3">
-                                <span class="text-on-tertiary-container font-extrabold text-title-md">05 /</span>
-                                <h3 class="text-on-surface font-title-md uppercase tracking-wider">AI Mood</h3>
-                            </div>
-                            <div
-                                class="relative bg-white/5 border border-white/5 hover:border-on-tertiary-container rounded-lg p-3 transition-colors duration-200">
-                                <select name="mood"
-                                    class="w-full bg-transparent border-none text-on-surface text-sm focus:ring-0 focus:outline-none cursor-pointer">
-                                    <option value="" class="bg-surface-container-high text-on-surface">Select Mood
-                                        (None)</option>
-                                    <option value="Happy" class="bg-surface-container-high text-on-surface">Happy
-                                        (Comedy/Adventure)</option>
-                                    <option value="Sad" class="bg-surface-container-high text-on-surface">Sad
-                                        (Drama/Inspirational)</option>
-                                    <option value="Excited" class="bg-surface-container-high text-on-surface">Excited
-                                        (Action/Sci-Fi)</option>
-                                    <option value="Relaxed" class="bg-surface-container-high text-on-surface">Relaxed
-                                        (Family/Animation)</option>
-                                    <option value="Romantic" class="bg-surface-container-high text-on-surface">Romantic
-                                        (Romance)</option>
-                                </select>
+                                <button type="button" class="w-full flex justify-between items-center bg-transparent text-on-surface text-sm focus:outline-none cursor-pointer custom-select-trigger">
+                                    <span class="custom-select-label">
+                                        {% if selected_era == '2000s' %}2000s (2000 - 2009)
+                                        {% elif selected_era == '90s' %}1990s (1990 - 1999)
+                                        {% elif selected_era == 'Classic' %}Classic (&lt; 1990)
+                                        {% else %}Modern (&ge; 2010){% endif %}
+                                    </span>
+                                    <span class="material-symbols-outlined text-[18px] transition-transform duration-200 arrow-icon">expand_more</span>
+                                </button>
+                                <div class="custom-select-options absolute top-[calc(100%+8px)] left-0 right-0 z-50 bg-[#1e2020] border border-white/10 rounded-lg shadow-2xl max-h-60 overflow-y-auto hidden">
+                                    <div class="custom-option px-4 py-2.5 text-sm text-white/70 hover:bg-[#E50914] hover:text-white cursor-pointer transition-colors" data-value="Modern">Modern (&ge; 2010)</div>
+                                    <div class="custom-option px-4 py-2.5 text-sm text-white/70 hover:bg-[#E50914] hover:text-white cursor-pointer transition-colors" data-value="2000s">2000s (2000 - 2009)</div>
+                                    <div class="custom-option px-4 py-2.5 text-sm text-white/70 hover:bg-[#E50914] hover:text-white cursor-pointer transition-colors" data-value="90s">1990s (1990 - 1999)</div>
+                                    <div class="custom-option px-4 py-2.5 text-sm text-white/70 hover:bg-[#E50914] hover:text-white cursor-pointer transition-colors" data-value="Classic">Classic (&lt; 1990)</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -249,19 +263,17 @@
                     <!-- Runtime Slider -->
                     <div class="space-y-3">
                         <div class="flex items-center gap-3">
-                            <span class="text-on-tertiary-container font-extrabold text-title-md">06 /</span>
+                            <span class="text-on-tertiary-container font-extrabold text-title-md">05 /</span>
                             <h3 class="text-on-surface font-title-md uppercase tracking-wider">Runtime Boundary</h3>
                         </div>
-                        <div
-                            class="bg-white/5 border border-white/5 hover:border-on-tertiary-container p-5 rounded-lg transition-all duration-300">
+                        <div class="bg-white/5 border border-white/5 hover:border-on-tertiary-container p-5 rounded-lg transition-all duration-300">
                             <div class="flex justify-between items-center text-sm mb-2 text-on-surface-variant">
                                 <span>Max Duration</span>
-                                <span class="text-on-tertiary-container font-extrabold tracking-wider"><span
-                                        id="range-val">150</span> mins</span>
+                                <span class="text-on-tertiary-container font-extrabold tracking-wider"><span id="range-val">{{ selected_runtime }}</span> mins</span>
                             </div>
                             <input
                                 class="w-full accent-on-tertiary-container cursor-pointer bg-white/10 h-1.5 rounded-full"
-                                type="range" name="runtime" min="45" max="240" value="150"
+                                type="range" name="runtime" min="45" max="240" value="{{ selected_runtime }}"
                                 oninput="document.getElementById('range-val').innerText = this.value" />
                         </div>
                     </div>
@@ -270,7 +282,7 @@
                 <!-- Action Submit Button -->
                 <div class="lg:col-span-2 pt-4 flex justify-start">
                     <button type="submit"
-                        class="px-10 py-4 bg-on-tertiary-container hover:bg-red-700 text-white font-extrabold text-sm uppercase tracking-widest rounded-lg transition-all shadow-lg hover:shadow-on-tertiary-container/30 active:scale-95">
+                        class="px-10 py-4 bg-on-tertiary-container hover:bg-red-700 text-white font-extrabold text-sm uppercase tracking-widest rounded-lg transition-all shadow-lg active:scale-95">
                         RECOMMENDED MOVIES
                     </button>
                 </div>
@@ -329,8 +341,7 @@
                                 <span class="material-symbols-outlined text-[11px]">bookmark</span>
                                 Watchlist
                             </button>
-                            <span class="text-[10px] text-on-tertiary-container font-extrabold">⭐ {{ movie.rating
-                                }}</span>
+                            <span class="text-[10px] text-on-tertiary-container font-extrabold">★ {{ movie.rating }}</span>
                         </div>
                     </div>
                 </div>
@@ -355,166 +366,265 @@
 
     <!-- Curated shelves displayed when search is not active to look premium -->
     {% if results is none %}
+    <!-- New Releases Shelf -->
+    <section class="pl-4 md:pl-0 max-w-container-max-width mx-auto">
+        <div class="flex justify-between items-end mb-6 pr-margin-mobile md:pr-0">
+            <h3 class="font-headline-lg text-headline-lg text-on-surface tracking-wider">New Releases</h3>
+            <span class="text-xs text-white/40 uppercase font-semibold">Latest Additions</span>
+        </div>
+
+        <div class="relative group/carousel">
+            <button onclick="scrollCarousel(this, -1)" class="absolute left-2 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 border border-white/10 text-white flex items-center justify-center opacity-0 group-hover/carousel:opacity-100 transition-all duration-300 pointer-events-none group-hover/carousel:pointer-events-auto shadow-lg backdrop-blur-md">
+                <span class="material-symbols-outlined text-2xl">chevron_left</span>
+            </button>
+            <div class="carousel-track flex gap-6 overflow-x-auto no-scrollbar pt-4 pb-6 pl-1 -ml-1 scroll-smooth">
+                {% for movie in new_releases %}
+            <div class="movie-card-hover group relative flex-none w-48 md:w-60 aspect-[2/3] rounded-xl overflow-hidden bg-surface-container cursor-pointer shadow-2xl spotlight-card"
+                data-movie='{{ movie | tojson }}'
+                onclick="openMovieDetailFromElement(this)">
+                <img class="w-full h-full object-cover lazy-cover" data-title="{{ movie.title }}" data-genres="{{ movie.genres }}"
+                    src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 3'%3E%3C/svg%3E"
+                    alt="{{ movie.title }}" />
+                <div
+                    class="absolute top-3 right-3 bg-on-tertiary-container text-white text-[10px] font-extrabold px-2 py-0.5 rounded tracking-wider shadow">
+                    {{ movie.match }}% MATCH
+                </div>
+
+                <!-- Watchlist overlay badge indicator -->
+                <div class="badge absolute top-3 left-3 bg-emerald-500 text-white rounded-full w-5 h-5 flex items-center justify-center font-bold text-[9px]"
+                    style="display: none">
+                    <span class="material-symbols-outlined text-[10px]"
+                        style="font-variation-settings: 'wght' 800;">check</span>
+                </div>
+
+                <div
+                    class="poster-gradient absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                    <div
+                        class="bg-black/60 backdrop-blur-md p-3 rounded-lg border border-white/10 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                        <h4 class="font-title-md text-white text-sm truncate font-extrabold">{{ movie.title }}</h4>
+                        <div class="flex gap-2 mt-1 text-[10px] text-white/60 font-semibold">
+                            <span>{{ movie.year }}</span>
+                            <span>•</span>
+                            <span>{{ movie.type or 'Movie' }}</span>
+                        </div>
+                        <div class="mt-3 pt-3 border-t border-white/10 flex justify-between items-center">
+                            <button
+                                onclick="event.stopPropagation(); toggleCarouselWatchlistFromBtn(this)"
+                                class="carousel-watchlist-btn px-3 py-1 bg-white text-black text-[10px] font-bold rounded flex items-center gap-1 active:scale-95 transition-all">
+                                <span class="material-symbols-outlined text-[11px]">bookmark</span>
+                                Watchlist
+                            </button>
+                            <span class="text-[10px] text-on-tertiary-container font-extrabold">★ {{ movie.rating }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            </div>
+            <button onclick="scrollCarousel(this, 1)" class="absolute right-2 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 border border-white/10 text-white flex items-center justify-center opacity-0 group-hover/carousel:opacity-100 transition-all duration-300 pointer-events-none group-hover/carousel:pointer-events-auto shadow-lg backdrop-blur-md">
+                <span class="material-symbols-outlined text-2xl">chevron_right</span>
+            </button>
+        </div>
+    </section>
+
     <!-- Trending Movies Shelf -->
     <section class="pl-4 md:pl-0 max-w-container-max-width mx-auto">
         <div class="flex justify-between items-end mb-6 pr-margin-mobile md:pr-0">
-            <h3 class="font-headline-lg text-headline-lg text-on-surface tracking-wider">🔥 Trending Movies</h3>
+            <h3 class="font-headline-lg text-headline-lg text-on-surface tracking-wider">Trending Movies</h3>
             <span class="text-xs text-white/40 uppercase font-semibold">Updated Hourly</span>
         </div>
 
-        <div class="flex gap-6 overflow-x-auto no-scrollbar pb-6 pl-1 -ml-1">
-            {% for movie in trending %}
-            <div class="flex-none w-48 md:w-60 group cursor-pointer"
+        <div class="relative group/carousel">
+            <button onclick="scrollCarousel(this, -1)" class="absolute left-2 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 border border-white/10 text-white flex items-center justify-center opacity-0 group-hover/carousel:opacity-100 transition-all duration-300 pointer-events-none group-hover/carousel:pointer-events-auto shadow-lg backdrop-blur-md">
+                <span class="material-symbols-outlined text-2xl">chevron_left</span>
+            </button>
+            <div class="carousel-track flex gap-6 overflow-x-auto no-scrollbar pt-4 pb-6 pl-1 -ml-1 scroll-smooth">
+                {% for movie in trending %}
+            <div class="movie-card-hover group relative flex-none w-48 md:w-60 aspect-[2/3] rounded-xl overflow-hidden bg-surface-container cursor-pointer shadow-2xl spotlight-card"
                 data-movie='{{ movie | tojson }}'
                 onclick="openMovieDetailFromElement(this)">
-                <div class="relative aspect-[2/3] rounded-xl overflow-hidden mb-3 border border-white/5 shadow-md spotlight-card">
-                    <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 lazy-cover"
-                        data-title="{{ movie.title }}" data-genres="{{ movie.genres }}"
-                        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 3'%3E%3C/svg%3E"
-                        alt="{{ movie.title }}" />
+                <img class="w-full h-full object-cover lazy-cover" data-title="{{ movie.title }}" data-genres="{{ movie.genres }}"
+                    src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 3'%3E%3C/svg%3E"
+                    alt="{{ movie.title }}" />
+                <div
+                    class="absolute top-3 right-3 bg-on-tertiary-container text-white text-[10px] font-extrabold px-2 py-0.5 rounded tracking-wider shadow">
+                    {{ movie.match }}% MATCH
+                </div>
+
+                <!-- Watchlist overlay badge indicator -->
+                <div class="badge absolute top-3 left-3 bg-emerald-500 text-white rounded-full w-5 h-5 flex items-center justify-center font-bold text-[9px]"
+                    style="display: none">
+                    <span class="material-symbols-outlined text-[10px]"
+                        style="font-variation-settings: 'wght' 800;">check</span>
+                </div>
+
+                <div
+                    class="poster-gradient absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
                     <div
-                        class="absolute top-3 right-3 px-2.5 py-0.5 bg-on-tertiary-container text-white text-[10px] font-extrabold rounded shadow-lg shadow-on-tertiary-container/30 tracking-wider">
-                        {{ movie.match }}% MATCH</div>
-                    <div
-                        class="absolute inset-0 bg-black/60 flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <button
-                            onclick="event.stopPropagation(); toggleCarouselWatchlistFromBtn(this)"
-                            class="carousel-watchlist-btn w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center hover:bg-on-tertiary-container transition-colors"><span
-                                class="material-symbols-outlined text-white text-sm">bookmark</span></button>
-                        <button
-                            onclick="event.stopPropagation(); alert('Liking this content helps customize your neural discover feed!')"
-                            class="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center hover:bg-emerald-600 transition-colors"><span
-                                class="material-symbols-outlined text-white text-sm">thumb_up</span></button>
+                        class="bg-black/60 backdrop-blur-md p-3 rounded-lg border border-white/10 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                        <h4 class="font-title-md text-white text-sm truncate font-extrabold">{{ movie.title }}</h4>
+                        <div class="flex gap-2 mt-1 text-[10px] text-white/60 font-semibold">
+                            <span>{{ movie.year }}</span>
+                            <span>•</span>
+                            <span>{{ movie.type or 'Movie' }}</span>
+                        </div>
+                        <div class="mt-3 pt-3 border-t border-white/10 flex justify-between items-center">
+                            <button
+                                onclick="event.stopPropagation(); toggleCarouselWatchlistFromBtn(this)"
+                                class="carousel-watchlist-btn px-3 py-1 bg-white text-black text-[10px] font-bold rounded flex items-center gap-1 active:scale-95 transition-all">
+                                <span class="material-symbols-outlined text-[11px]">bookmark</span>
+                                Watchlist
+                            </button>
+                            <span class="text-[10px] text-on-tertiary-container font-extrabold">★ {{ movie.rating }}</span>
+                        </div>
                     </div>
                 </div>
-                <h4 class="font-title-md text-on-surface truncate pr-2 font-bold">{{ movie.title }}</h4>
-                <p class="text-label-sm text-on-surface-variant font-semibold mt-0.5">{{ movie.genres.split(',')[0] }} •
-                    {{ movie.year }}</p>
             </div>
             {% endfor %}
+            </div>
+            <button onclick="scrollCarousel(this, 1)" class="absolute right-2 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 border border-white/10 text-white flex items-center justify-center opacity-0 group-hover/carousel:opacity-100 transition-all duration-300 pointer-events-none group-hover/carousel:pointer-events-auto shadow-lg backdrop-blur-md">
+                <span class="material-symbols-outlined text-2xl">chevron_right</span>
+            </button>
         </div>
     </section>
 
     <!-- Most Watched Shelf -->
     <section class="pl-4 md:pl-0 max-w-container-max-width mx-auto">
         <div class="flex justify-between items-end mb-6 pr-margin-mobile md:pr-0">
-            <h3 class="font-headline-lg text-headline-lg text-on-surface tracking-wider">👁️ Most Watched</h3>
+            <h3 class="font-headline-lg text-headline-lg text-on-surface tracking-wider">Most Watched</h3>
             <span class="text-xs text-white/40 uppercase font-semibold">Based on Clicks & Saves</span>
         </div>
 
-        <div class="flex gap-6 overflow-x-auto no-scrollbar pb-6 pl-1 -ml-1">
-            {% for movie in most_watched %}
-            <div class="flex-none w-48 md:w-60 group cursor-pointer"
+        <div class="relative group/carousel">
+            <button onclick="scrollCarousel(this, -1)" class="absolute left-2 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 border border-white/10 text-white flex items-center justify-center opacity-0 group-hover/carousel:opacity-100 transition-all duration-300 pointer-events-none group-hover/carousel:pointer-events-auto shadow-lg backdrop-blur-md">
+                <span class="material-symbols-outlined text-2xl">chevron_left</span>
+            </button>
+            <div class="carousel-track flex gap-6 overflow-x-auto no-scrollbar pt-4 pb-6 pl-1 -ml-1 scroll-smooth">
+                {% for movie in most_watched %}
+            <div class="movie-card-hover group relative flex-none w-48 md:w-60 aspect-[2/3] rounded-xl overflow-hidden bg-surface-container cursor-pointer shadow-2xl spotlight-card"
                 data-movie='{{ movie | tojson }}'
                 onclick="openMovieDetailFromElement(this)">
-                <div class="relative aspect-[2/3] rounded-xl overflow-hidden mb-3 border border-white/5 shadow-md spotlight-card">
-                    <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 lazy-cover"
-                        data-title="{{ movie.title }}" data-genres="{{ movie.genres }}"
-                        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 3'%3E%3C/svg%3E"
-                        alt="{{ movie.title }}" />
+                <img class="w-full h-full object-cover lazy-cover" data-title="{{ movie.title }}" data-genres="{{ movie.genres }}"
+                    src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 3'%3E%3C/svg%3E"
+                    alt="{{ movie.title }}" />
+                <div
+                    class="absolute top-3 right-3 bg-on-tertiary-container text-white text-[10px] font-extrabold px-2 py-0.5 rounded tracking-wider shadow">
+                    {{ movie.match }}% MATCH
+                </div>
+
+                <!-- Watchlist overlay badge indicator -->
+                <div class="badge absolute top-3 left-3 bg-emerald-500 text-white rounded-full w-5 h-5 flex items-center justify-center font-bold text-[9px]"
+                    style="display: none">
+                    <span class="material-symbols-outlined text-[10px]"
+                        style="font-variation-settings: 'wght' 800;">check</span>
+                </div>
+
+                <div
+                    class="poster-gradient absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
                     <div
-                        class="absolute top-3 right-3 px-2.5 py-0.5 bg-on-tertiary-container text-white text-[10px] font-extrabold rounded shadow-lg tracking-wider">
-                        {{ movie.match }}% MATCH</div>
-                    <div
-                        class="absolute inset-0 bg-black/60 flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <button
-                            onclick="event.stopPropagation(); toggleCarouselWatchlistFromBtn(this)"
-                            class="carousel-watchlist-btn w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center hover:bg-on-tertiary-container transition-colors"><span
-                                class="material-symbols-outlined text-white text-sm">bookmark</span></button>
-                        <button
-                            onclick="event.stopPropagation(); alert('Liking content helps customize your discovery feed!')"
-                            class="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center hover:bg-emerald-600 transition-colors"><span
-                                class="material-symbols-outlined text-white text-sm">thumb_up</span></button>
+                        class="bg-black/60 backdrop-blur-md p-3 rounded-lg border border-white/10 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                        <h4 class="font-title-md text-white text-sm truncate font-extrabold">{{ movie.title }}</h4>
+                        <div class="flex gap-2 mt-1 text-[10px] text-white/60 font-semibold">
+                            <span>{{ movie.year }}</span>
+                            <span>•</span>
+                            <span>{{ movie.type or 'Movie' }}</span>
+                        </div>
+                        <div class="mt-3 pt-3 border-t border-white/10 flex justify-between items-center">
+                            <button
+                                onclick="event.stopPropagation(); toggleCarouselWatchlistFromBtn(this)"
+                                class="carousel-watchlist-btn px-3 py-1 bg-white text-black text-[10px] font-bold rounded flex items-center gap-1 active:scale-95 transition-all">
+                                <span class="material-symbols-outlined text-[11px]">bookmark</span>
+                                Watchlist
+                            </button>
+                            <span class="text-[10px] text-on-tertiary-container font-extrabold">★ {{ movie.rating }}</span>
+                        </div>
                     </div>
                 </div>
-                <h4 class="font-title-md text-on-surface truncate pr-2 font-bold">{{ movie.title }}</h4>
-                <p class="text-label-sm text-on-surface-variant font-semibold mt-0.5">{{ movie.genres.split(',')[0] }} •
-                    {{ movie.year }}</p>
             </div>
             {% endfor %}
+            </div>
+            <button onclick="scrollCarousel(this, 1)" class="absolute right-2 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 border border-white/10 text-white flex items-center justify-center opacity-0 group-hover/carousel:opacity-100 transition-all duration-300 pointer-events-none group-hover/carousel:pointer-events-auto shadow-lg backdrop-blur-md">
+                <span class="material-symbols-outlined text-2xl">chevron_right</span>
+            </button>
         </div>
     </section>
 
     <!-- Top Rated Shelf -->
     <section class="pl-4 md:pl-0 max-w-container-max-width mx-auto">
         <div class="flex justify-between items-end mb-6 pr-margin-mobile md:pr-0">
-            <h3 class="font-headline-lg text-headline-lg text-on-surface tracking-wider">⭐ Top Rated Films</h3>
+            <h3 class="font-headline-lg text-headline-lg text-on-surface tracking-wider">Top Rated Films</h3>
             <span class="text-xs text-white/40 uppercase font-semibold">Critical Acclaim</span>
         </div>
 
-        <div class="flex gap-6 overflow-x-auto no-scrollbar pb-6 pl-1 -ml-1">
-            {% for movie in top_rated %}
-            <div class="flex-none w-48 md:w-60 group cursor-pointer"
+        <div class="relative group/carousel">
+            <button onclick="scrollCarousel(this, -1)" class="absolute left-2 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 border border-white/10 text-white flex items-center justify-center opacity-0 group-hover/carousel:opacity-100 transition-all duration-300 pointer-events-none group-hover/carousel:pointer-events-auto shadow-lg backdrop-blur-md">
+                <span class="material-symbols-outlined text-2xl">chevron_left</span>
+            </button>
+            <div class="carousel-track flex gap-6 overflow-x-auto no-scrollbar pt-4 pb-6 pl-1 -ml-1 scroll-smooth">
+                {% for movie in top_rated %}
+            <div class="movie-card-hover group relative flex-none w-48 md:w-60 aspect-[2/3] rounded-xl overflow-hidden bg-surface-container cursor-pointer shadow-2xl spotlight-card"
                 data-movie='{{ movie | tojson }}'
                 onclick="openMovieDetailFromElement(this)">
-                <div class="relative aspect-[2/3] rounded-xl overflow-hidden mb-3 border border-white/5 shadow-md spotlight-card">
-                    <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 lazy-cover"
-                        data-title="{{ movie.title }}" data-genres="{{ movie.genres }}"
-                        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 3'%3E%3C/svg%3E"
-                        alt="{{ movie.title }}" />
+                <img class="w-full h-full object-cover lazy-cover" data-title="{{ movie.title }}" data-genres="{{ movie.genres }}"
+                    src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 3'%3E%3C/svg%3E"
+                    alt="{{ movie.title }}" />
+                <div
+                    class="absolute top-3 right-3 bg-on-tertiary-container text-white text-[10px] font-extrabold px-2 py-0.5 rounded tracking-wider shadow">
+                    {{ movie.match }}% MATCH
+                </div>
+
+                <!-- Watchlist overlay badge indicator -->
+                <div class="badge absolute top-3 left-3 bg-emerald-500 text-white rounded-full w-5 h-5 flex items-center justify-center font-bold text-[9px]"
+                    style="display: none">
+                    <span class="material-symbols-outlined text-[10px]"
+                        style="font-variation-settings: 'wght' 800;">check</span>
+                </div>
+
+                <div
+                    class="poster-gradient absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
                     <div
-                        class="absolute top-3 right-3 px-2.5 py-0.5 bg-on-tertiary-container text-white text-[10px] font-extrabold rounded shadow-lg tracking-wider">
-                        {{ movie.match }}% MATCH</div>
-                    <div
-                        class="absolute inset-0 bg-black/60 flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <button
-                            onclick="event.stopPropagation(); toggleCarouselWatchlistFromBtn(this)"
-                            class="carousel-watchlist-btn w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center hover:bg-on-tertiary-container transition-colors"><span
-                                class="material-symbols-outlined text-white text-sm">bookmark</span></button>
-                        <button
-                            onclick="event.stopPropagation(); alert('Liking content helps customize your discovery feed!')"
-                            class="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center hover:bg-emerald-600 transition-colors"><span
-                                class="material-symbols-outlined text-white text-sm">thumb_up</span></button>
+                        class="bg-black/60 backdrop-blur-md p-3 rounded-lg border border-white/10 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                        <h4 class="font-title-md text-white text-sm truncate font-extrabold">{{ movie.title }}</h4>
+                        <div class="flex gap-2 mt-1 text-[10px] text-white/60 font-semibold">
+                            <span>{{ movie.year }}</span>
+                            <span>•</span>
+                            <span>{{ movie.type or 'Movie' }}</span>
+                        </div>
+                        <div class="mt-3 pt-3 border-t border-white/10 flex justify-between items-center">
+                            <button
+                                onclick="event.stopPropagation(); toggleCarouselWatchlistFromBtn(this)"
+                                class="carousel-watchlist-btn px-3 py-1 bg-white text-black text-[10px] font-bold rounded flex items-center gap-1 active:scale-95 transition-all">
+                                <span class="material-symbols-outlined text-[11px]">bookmark</span>
+                                Watchlist
+                            </button>
+                            <span class="text-[10px] text-on-tertiary-container font-extrabold">★ {{ movie.rating }}</span>
+                        </div>
                     </div>
                 </div>
-                <h4 class="font-title-md text-on-surface truncate pr-2 font-bold">{{ movie.title }}</h4>
-                <p class="text-label-sm text-on-surface-variant font-semibold mt-0.5">{{ movie.genres.split(',')[0] }} •
-                    {{ movie.year }}</p>
             </div>
             {% endfor %}
+            </div>
+            <button onclick="scrollCarousel(this, 1)" class="absolute right-2 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 border border-white/10 text-white flex items-center justify-center opacity-0 group-hover/carousel:opacity-100 transition-all duration-300 pointer-events-none group-hover/carousel:pointer-events-auto shadow-lg backdrop-blur-md">
+                <span class="material-symbols-outlined text-2xl">chevron_right</span>
+            </button>
         </div>
     </section>
 
-    <!-- New Releases Shelf -->
-    <section class="pl-4 md:pl-0 max-w-container-max-width mx-auto">
-        <div class="flex justify-between items-end mb-6 pr-margin-mobile md:pr-0">
-            <h3 class="font-headline-lg text-headline-lg text-on-surface tracking-wider">📅 New Releases</h3>
-            <span class="text-xs text-white/40 uppercase font-semibold">Latest Additions</span>
-        </div>
 
-        <div class="flex gap-6 overflow-x-auto no-scrollbar pb-6 pl-1 -ml-1">
-            {% for movie in new_releases %}
-            <div class="flex-none w-48 md:w-60 group cursor-pointer"
-                data-movie='{{ movie | tojson }}'
-                onclick="openMovieDetailFromElement(this)">
-                <div class="relative aspect-[2/3] rounded-xl overflow-hidden mb-3 border border-white/5 shadow-md spotlight-card">
-                    <img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 lazy-cover"
-                        data-title="{{ movie.title }}" data-genres="{{ movie.genres }}"
-                        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 3'%3E%3C/svg%3E"
-                        alt="{{ movie.title }}" />
-                    <div
-                        class="absolute top-3 right-3 px-2.5 py-0.5 bg-on-tertiary-container text-white text-[10px] font-extrabold rounded shadow-lg tracking-wider">
-                        {{ movie.match }}% MATCH</div>
-                    <div
-                        class="absolute inset-0 bg-black/60 flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <button
-                            onclick="event.stopPropagation(); toggleCarouselWatchlistFromBtn(this)"
-                            class="carousel-watchlist-btn w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center hover:bg-on-tertiary-container transition-colors"><span
-                                class="material-symbols-outlined text-white text-sm">bookmark</span></button>
-                        <button
-                            onclick="event.stopPropagation(); alert('Liking content helps customize your discovery feed!')"
-                            class="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center hover:bg-emerald-600 transition-colors"><span
-                                class="material-symbols-outlined text-white text-sm">thumb_up</span></button>
-                    </div>
-                </div>
-                <h4 class="font-title-md text-on-surface truncate pr-2 font-bold">{{ movie.title }}</h4>
-                <p class="text-label-sm text-on-surface-variant font-semibold mt-0.5">{{ movie.genres.split(',')[0] }} •
-                    {{ movie.year }}</p>
-            </div>
-            {% endfor %}
-        </div>
-    </section>
     {% endif %}
+
+    <!-- Navigation Buttons at the Bottom of Recommendations -->
+    <div class="max-w-container-max-width mx-auto mt-16 mb-8 px-4 flex flex-col sm:flex-row justify-center items-center gap-4">
+        <a href="/genres" class="w-full sm:w-auto px-8 py-3.5 bg-white/5 border border-white/10 hover:border-on-tertiary-container hover:bg-white/10 text-white font-extrabold text-sm uppercase tracking-widest rounded-lg transition-all text-center active:scale-95 shadow">
+            Explore Genres
+        </a>
+        <a href="/eras" class="w-full sm:w-auto px-8 py-3.5 bg-white/5 border border-white/10 hover:border-on-tertiary-container hover:bg-white/10 text-white font-extrabold text-sm uppercase tracking-widest rounded-lg transition-all text-center active:scale-95 shadow">
+            Explore Eras
+        </a>
+        <a href="/chatbot" class="w-full sm:w-auto px-8 py-3.5 bg-on-tertiary-container hover:bg-red-700 text-white font-extrabold text-sm uppercase tracking-widest rounded-lg transition-all text-center active:scale-95 shadow-lg">
+            Ask AI Chatbot
+        </a>
+    </div>
 
 </div>
 
@@ -662,6 +772,20 @@
     document.addEventListener("DOMContentLoaded", () => {
         assignPremiumImages();
         initWatchlistStates();
+
+        // Enforce single-select genre checkbox behavior
+        const genreCheckboxes = document.querySelectorAll('input[name="genres"]');
+        genreCheckboxes.forEach(cb => {
+            cb.addEventListener('change', () => {
+                if (cb.checked) {
+                    genreCheckboxes.forEach(other => {
+                        if (other !== cb) {
+                            other.checked = false;
+                        }
+                    });
+                }
+            });
+        });
         
         // Listen to custom watchlist state change event to update the page reactively
         window.addEventListener("cinematch_watchlist_changed", initWatchlistStates);
@@ -693,5 +817,58 @@
             };
         }
     });
+
+    // Custom select dropdown logic
+    document.querySelectorAll('.custom-select-wrapper').forEach(wrapper => {
+        const trigger = wrapper.querySelector('.custom-select-trigger');
+        const optionsContainer = wrapper.querySelector('.custom-select-options');
+        const select = wrapper.querySelector('select');
+        const label = wrapper.querySelector('.custom-select-label');
+        const arrow = wrapper.querySelector('.arrow-icon');
+
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            // Close other dropdowns
+            document.querySelectorAll('.custom-select-options').forEach(el => {
+                if (el !== optionsContainer) el.classList.add('hidden');
+            });
+            document.querySelectorAll('.arrow-icon').forEach(icon => {
+                if (icon !== arrow) icon.classList.remove('rotate-180');
+            });
+
+            optionsContainer.classList.toggle('hidden');
+            arrow.classList.toggle('rotate-180');
+        });
+
+        wrapper.querySelectorAll('.custom-option').forEach(option => {
+            option.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const val = option.getAttribute('data-value');
+                select.value = val;
+                label.textContent = option.textContent;
+                optionsContainer.classList.add('hidden');
+                arrow.classList.remove('rotate-180');
+
+                // Trigger change event for form processing
+                select.dispatchEvent(new Event('change'));
+            });
+        });
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.custom-select-options').forEach(el => el.classList.add('hidden'));
+        document.querySelectorAll('.arrow-icon').forEach(icon => icon.classList.remove('rotate-180'));
+    });
+
+    function scrollCarousel(button, direction) {
+        const container = button.closest('.group\\/carousel');
+        const track = container.querySelector('.carousel-track');
+        const scrollAmount = track.clientWidth * 0.75;
+        track.scrollBy({
+            left: direction * scrollAmount,
+            behavior: 'smooth'
+        });
+    }
 </script>
 {% endblock %}

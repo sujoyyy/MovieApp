@@ -293,12 +293,19 @@ def init_netflix_db():
                     # Build summary using metadata
                     desc_val = f"A {genre_val} film directed by {director_val}, starring {actor_str}."
                     
-                    # Determine language: default to Hindi (Bollywood), classify as Bengali if keywords match
+                    # Determine language: default to Hindi (Bollywood), classify as Bengali/Telugu/Malayalam if keywords match
                     lang = 'Hindi'
                     desc_lower = f"{title_val} {director_val} {actor_str}".lower()
                     bengali_surnames = {'sengupta', 'chatterjee', 'mukherjee', 'banerjee', 'ray', 'chakraborty', 'majumdar', 'bengali', 'ghosh', 'bose', 'sen', 'mitra', 'dutta', 'roy', 'dasgupta', 'ganguly'}
+                    telugu_keywords = {'ntr', 'ram charan', 'allu arjun', 'prabhas', 'chiranjeevi', 'mahesh babu', 'pawan kalyan', 'rajamouli', 'nani', 'nt rama rao', 'nagarjuna', 'balakrishna', 'daggubati', 'deverakonda', 'telugu'}
+                    malayalam_keywords = {'mammootty', 'mohanlal', 'dulquer', 'fahadh', 'faasil', 'nivin pauly', 'prithviraj', 'tovino', 'pothan', 'basil joseph', 'lijo jose', 'malayalam', 'kurup'}
+                    
                     if any(surname in desc_lower for surname in bengali_surnames):
                         lang = 'Bengali'
+                    elif any(kw in desc_lower for kw in telugu_keywords):
+                        lang = 'Telugu'
+                    elif any(kw in desc_lower for kw in malayalam_keywords):
+                        lang = 'Malayalam'
                         
                     bollywood_movies_to_insert.append((
                         'Movie',
@@ -336,14 +343,42 @@ def init_netflix_db():
         ('Movie', 'Everything Everywhere All at Once', 'Action & Adventure, Comedies, Sci-Fi', 2022, 139, 8.1, 'A middle-aged Chinese immigrant is swept up into an insane adventure in which she alone can save existence by exploring other universes.', 'English'),
         ('Movie', 'The Matrix Resurrections', 'Sci-Fi, Action & Adventure', 2021, 148, 5.7, 'To find out if his reality is a physical or mental construct, Thomas Anderson will have to choose to follow the white rabbit once more.', 'English'),
         ('Movie', 'Parasite', 'Thrillers, Dramas, International Movies', 2019, 132, 8.5, 'Greed and class discrimination threaten the newly formed symbiotic relationship between the wealthy Park family and the destitute Kim clan.', 'English'),
-        ('Movie', '3 Idiots', 'Comedies, Dramas, International Movies', 2009, 170, 8.4, 'Two friends search for their long-lost companion. They revisit their college days and recall the memories of their friend who inspired them to think differently.', 'Hindi'),
         ('Movie', 'The Dark Knight', 'Action & Adventure, Thrillers, Dramas', 2008, 152, 9.0, 'When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman must accept one of the greatest psychological and physical tests of his ability to fight injustice.', 'English'),
         ('Movie', 'Titanic', 'Romantic Movies, Dramas', 1997, 194, 7.9, 'A seventeen-year-old aristocrat falls in love with a kind but poor artist aboard the luxurious, ill-fated R.M.S. Titanic.', 'English'),
         ('Movie', 'Pulp Fiction', 'Cult Movies, Thrillers, Dramas', 1994, 154, 8.9, 'The lives of two mob hitmen, a boxer, a gangster and his wife, and a pair of diner bandits intertwine in four tales of violence and redemption.', 'English'),
         ('Movie', 'Back to the Future', 'Comedies, Sci-Fi & Fantasy, Classic Movies', 1985, 116, 8.5, 'Marty McFly, a 17-year-old high school student, is accidentally sent thirty years into the past in a time-traveling DeLorean invented by his close friend, the eccentric scientist Doc Brown.', 'English'),
         ('Movie', 'The Godfather', 'Classic Movies, Dramas', 1972, 175, 9.2, 'The aging patriarch of an organized crime dynasty in postwar New York City transfers control of his clandestine empire to his reluctant youngest son.', 'English'),
-        ('Movie', 'Pather Panchali', 'Classic Movies, Dramas, International Movies', 1955, 115, 8.5, 'The life of a poor family in a Bengali village, centering on the young boy Apu, his sister Durga, and their struggle for survival.', 'Bengali'),
-        ('Movie', 'Casablanca', 'Classic Movies, Romantic Movies, Dramas', 1942, 102, 8.5, 'A cynical American expatriate cafe owner struggles to decide whether or not to help his former lover and her fugitive husband escape the Nazis in French Morocco.', 'English')
+        ('Movie', 'Casablanca', 'Classic Movies, Romantic Movies, Dramas', 1942, 102, 8.5, 'A cynical American expatriate cafe owner struggles to decide whether or not to help his former lover and her fugitive husband escape the Nazis in French Morocco.', 'English'),
+        
+        # Tollywood (Telugu) Blockbusters
+        ('Movie', 'Baahubali: The Beginning', 'Action, Fantasy, Adventure', 2015, 159, 8.0, 'In ancient India, an adventurous and daring man falling in love with a woman warrior helps her rescue her former queen.', 'Telugu'),
+        ('Movie', 'Baahubali 2: The Conclusion', 'Action, Fantasy, Adventure', 2017, 167, 8.2, 'When Shiva, the son of Bahubali, learns about his heritage, he begins to look for answers. His story is juxtaposed with past events.', 'Telugu'),
+        ('Movie', 'RRR', 'Action, Drama, History', 2022, 187, 8.3, 'A fearless revolutionary and an officer in the British army, who are close friends, decide to join forces and chart an inspirational path of freedom.', 'Telugu'),
+        ('Movie', 'Pushpa: The Rise', 'Action, Thriller, Crime', 2021, 179, 7.6, 'Violence erupts between red sandalwood smugglers and the police in the Seshachalam forests of Andhra Pradesh.', 'Telugu'),
+        ('Movie', 'Kalki 2898 AD', 'Sci-Fi, Action, Fantasy', 2024, 180, 7.8, 'A modern avatar of Vishnu, a Hindu god, is believed to have descended to Earth to protect the world from evil forces.', 'Telugu'),
+        ('Movie', 'Salaar: Part 1 - Ceasefire', 'Action, Thriller, Crime', 2023, 175, 7.5, 'A gang leader makes a promise to his dying friend and takes on other criminal gangs.', 'Telugu'),
+        ('Movie', 'Hanu-Man', 'Action, Fantasy, Adventure', 2024, 158, 8.0, 'An imaginary place called Anjanadri where the protagonist gets the power of Hanuman and fights for his people.', 'Telugu'),
+        
+        # Mollywood (Malayalam) Blockbusters
+        ('Movie', 'Drishyam', 'Thriller, Drama, Crime', 2013, 160, 8.3, 'A man goes to extreme lengths to save his family from punishment after they commit an accidental crime.', 'Malayalam'),
+        ('Movie', 'Drishyam 2', 'Thriller, Drama, Crime', 2021, 153, 8.4, 'A gripping tale of an investigation and a family which is threatened by it, with Georgekutty leading his family once again.', 'Malayalam'),
+        ('Movie', 'Manjummel Boys', 'Thriller, Drama, Survival', 2024, 135, 8.3, 'A group of friends face a challenging rescue mission inside Guna Caves after one of their friends falls into a deep pit.', 'Malayalam'),
+        ('Movie', 'Premalu', 'Comedy, Romance', 2024, 156, 7.9, 'Sachin pursues romance with Reenu, but gets caught between two options, leading to hilarious situations.', 'Malayalam'),
+        ('Movie', 'Bramayugam', 'Horror, Thriller, Mystery', 2024, 139, 7.9, 'A folklore horror film set in 18th century Kerala, where a singer escapes captivity only to find a mysterious mansion.', 'Malayalam'),
+        ('Movie', 'Aavesham', 'Action, Comedy', 2024, 158, 8.0, 'Three college students seek the help of a local gangster to take revenge on their seniors who bullied them.', 'Malayalam'),
+        ('Movie', 'Kumbalangi Nights', 'Drama, Comedy, Romance', 2019, 135, 8.6, 'The love-hate relationship of four brothers living in a dysfunctional home and how they come together.', 'Malayalam'),
+        ('Movie', 'Minnal Murali', 'Action, Fantasy, Comedy', 2021, 158, 7.9, 'An ordinary tailor gains superpower after being struck by lightning, and must protect his village.', 'Malayalam'),
+        
+        # Bollywood (Hindi) Modern Hits
+        ('Movie', 'Stree 2', 'Horror, Comedy', 2024, 147, 8.0, 'In the town of Chanderi, a headless entity named Sarkata begins abducting women, and Stree is called upon to save them.', 'Hindi'),
+        ('Movie', 'Jawan', 'Action, Thriller, Crime', 2023, 169, 7.0, 'A high-octane action thriller which outlines the emotional journey of a man who is set to rectify the wrongs in the society.', 'Hindi'),
+        ('Movie', 'Pathaan', 'Action, Thriller, Adventure', 2023, 146, 5.9, 'An Indian house agent goes head-to-head with a former agent who leads a rogue unit planning a weapon attack on India.', 'Hindi'),
+        ('Movie', 'Animal', 'Action, Drama, Crime', 2023, 201, 6.6, 'A son undergoes a remarkable transformation as the bond with his father is tested, leading him to war against a dangerous enemy.', 'Hindi'),
+        ('Movie', 'Shershaah', 'Action, Biography, Drama', 2021, 135, 8.4, 'The life of Captain Vikram Batra, an Indian soldier who was awarded the Param Vir Chakra for his actions during the Kargil War.', 'Hindi'),
+        ('Movie', 'Dangal', 'Biography, Drama, Sports', 2016, 161, 8.3, 'Former wrestler Mahavir Singh Phogat and his two wrestler daughters struggle towards glory at the Commonwealth Games.', 'Hindi'),
+        ('Movie', 'Bajrangi Bhaijaan', 'Drama, Comedy, Action', 2015, 163, 8.1, 'A man with a magnanimous heart takes a young mute Pakistani girl back to her homeland to reunite her with her family.', 'Hindi'),
+        ('Movie', '3 Idiots', 'Comedies, Dramas, International Movies', 2009, 170, 8.4, 'Two friends search for their long-lost companion. They revisit their college days and recall the memories of their friend who inspired them to think differently.', 'Hindi'),
+        ('Movie', 'Pather Panchali', 'Classic Movies, Dramas, International Movies', 1955, 115, 8.5, 'The life of a poor family in a Bengali village, centering on the young boy Apu, his sister Durga, and their struggle for survival.', 'Bengali')
     ]
     
     for m in custom_movies:
